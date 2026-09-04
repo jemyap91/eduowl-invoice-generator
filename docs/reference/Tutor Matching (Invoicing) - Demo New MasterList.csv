@@ -1,0 +1,69 @@
+No,Tutor,Tutor's Number,Student,Parent's Name,Subject,Address,Timeslot,Timesheet,Deposit,Parent's Payment Rate,Tutor's Pay Rate,Curriculum Briefed?,Group Chat Created?,Checked in with Parent and Tutor after Trial lessons?,Monthly Est Profit,Remarks,Additional Materials ,Jan,,,Feb,,,Mar,,,Apr,,,May,,,Jun,,,July,,,August,,,Sept,,,Oct,,,Nov,,,Dec 24,,,Jan 25,,,Feb 25,,,Mar 25,,,Apr 25,,,May 25,,,June 25,,,July 25,,,August 25,,,September 25,,,October 25,,,November 25,,,December 25,,,January 26,,,May 26,,,June 26,,,July 26,,,August 26,,
+,,,,,,,,,,,,,,,,,,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff,Invoice Amt,Tutor Pay,Diff
+JAJE01,Guan Wen,9634 2496,Janice & Jeanie,Debbie Ang Soo Pei,Secondary G2 Eng,Clementi,,Guan Wen's Timesheet,N/A,70/hr,50/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$560.00,$400.00,$160.00,$560,$400,$160,$700,$500,$200,,,$0
+ZB01,Guan Wen,9634 2496,Zhao Bin,Li Shiwei,Foundational Eng,,,Guan Wen's Timesheet,N/A,65/hr,50/hr,,,,,,,,,#REF!,,,#REF!,,,#REF!,,Remainder,#REF!,,,#REF!,,,#REF!,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$812.50,$625.00,$187.50,$390,$300,$90,,,$0,,,$0
+ZB02,Zijie,9720 5889,Zhao Bin,Li Shiwei,Foundational Eng,,,Zijie's Timesheet,$960.00,120/hr,120/hr,,,,,Owe ZB $330,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$960.00,$960.00,$0.00,$240,$240,$0,,,$0,,,$0
+D01,Guan Wen,9634 2496,David,Wang Yue Ting,S4 G2 Foundational Eng,,,Guan Wen's Timesheet,N/A,65/hr,50/hr,,,,,Relief for Zijie,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$240.00,$100,$140.00,$620,$480,$140,$390,$300,$90,,,$0
+D02,Zijie,9720 5889,David,Wang Yue Ting,S4 G2 Foundational Eng,,,Zijie's Timesheet,N/A,"Group: 80/hr
+1 to 1: 120/hr","Group: 80/hr
+1 to 1: 120/hr",,,,,Pay directly to ZJ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"$1,840.00","$1,840.00",$0.00,$960,$960,$0,"$1,020","$1,020",$0,,,$0
+IR01,Yuna,9129 6882,Isaac Rey,Valerie Tan ,"P1 Eng,Math,Chi",Ang Mo Kio,,Yuna's Timesheet,N/A,40/hr,30/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$600.00,$450.00,$150.00,$480,$360,$120,$580,$435,$145,,,$0
+RT01,Yuna,9129 6882,Rae Teo,Fong Xin Yi,Chinese Reading,151 Cavenagh road #10-163,,Yuna's Timesheet,N/A,40/hr,30/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$160.00,$120.00,$40.00,,,,,,$0,,,$0
+SH01,Caitlin,8778 1699,Shreya,Archita,S3 Chemistry,,,Caitlin's Timesheet,N/A,55/hr,45/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,No session. Did this stop?,,,,,,,,S$0.00,,,$0
+NA01,Caitlin,8778 1699,Nawfal,Khamilia,S4 Combined Sci (C/P),554 Chua Chu Kang North 6 #08-44,,Caitlin's Timesheet,$400.00,50/hr,35/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$500.00,$350.00,$150.00,$400,$280,$120,$400,$280,S$120.00,,,$0
+NA02,Cindy,8428 5195,Nawfal,Khamilia,S4 POA,,,Cindy's Timesheet,N/A,60/hr,50/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+NS01,Syed,9839 7041,Naseef,Khamilia,P6 Science,554 Chua Chu Kang North 6 #08-44,,Syed's Timesheet,$480.00,60/hr,60/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$90.00,$90.00,$0.00,$360,$360,$0,$330,$330,S$0.00,,,$0
+NS02,Stephanie,9234 3816,Naseef,Khamilia,P6 Math,554 Chua Chu Kang North 6 #08-44,,Stephanie's Timesheet - Whatsapp,N/A,60/hr,50/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$300.00,$250.00,$50.00,,,,$450,$375,S$75.00,,,$0
+NS03,Charmaine,9645 1382,Naseef,Khamilia,P6 Math,554 Chua Chu Kang North 6 #08-44,,Charmaine's Timesheet,N/A,60/hr,50/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,No session,,,$690,$575,$115,,,S$0.00,,,$0
+SU01,Stephanie,9234 3816,Sumayra,Samir,P6 Chinese/Math,,,Stephanie's Timesheet - Whatsapp,N/A,60/hr,50/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$840.00,$700.00,$140.00,No session,,,,,S$0.00,,,$0
+SU02,Jasmine,8291 1117,Sumayra,Samir,P6 Science/Math/Chinese/English,,,Jasmine's Timesheet,N/A,55/hr,50/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$211.00,$193.50,$17.50,$880,$800,$80,"$1,265","$1,150",S$115.00,,,$0
+SU03,Jasmine,8291 1117,Sumayra,Samir,P6 Chinese,,,Jasmine's Timesheet,N/A,55/hr,50/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,No session,,,$440,$400,$40,,,S$0.00,,,$0
+CH01,Shefa,8648 3006,Yim Chern Han,Siew Kien,S2 G2 Science,5A Marsiling Dr  #04-465 s732005,,Shefa's Timesheet,$320.00,40/hr,30/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$320.00,$240.00,$80.00,$240,$180,$60,$320,$240,S$80.00,,,$0
+AN01,Mansib,9772 1241,Andrea,Jess/ Ng Chee Long,S3 E Combined Sci (C),,,Mansib's Timesheet,$400.00,50/hr,40/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$300.00,$240.00,$60.00,$400,$320,$80,$100,$80,S$20.00,,,$0
+CR01,Si Ying,9365 4685,Crystal,Christina,S4 G3 English,,,Si Ying's Timesheet,$480.00,60/hr,50/hr,,,,,Contact via Wechat,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$480.00,$400.00,$80.00,,,,,,S$0.00,,,$0
+CR02,Zijie,9720 5889,Crystal,Christina,S4 G3 English,,,Zijie's Timesheet,$640.00,"Group: 80/hr
+1 to 1: 120/hr","Group: 80/hr
+1 to 1: 120/hr",,,,,Contact via Wechat,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$640.00,$640.00,$0.00,$480,$480,$0,"$1,520","$1,520",S$0.00,"$1,520","$1,520",$0
+CR03,Guan Wen,9634 2496,Crystal,Christina,S4 G3 English,,,Guan Wen's Timesheet,N/A,"Group: 80/hr
+1 to 1: 120/hr",50/hr,,,,,Relief for Zijie,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,No session,,,$100,$80,$20,,,S$0.00,,,$0
+R01,Madeline,9101 5596,Ray,Petrina,S3 G2 Chem,Blk 849 woodlands street 82 #10-205,,NA(Tutor collects payment herself),N/A,Tutor will collect payment herself,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$300,$0,$300,,,,,,S$0.00,,,$0
+R02,Zijie,9720 5889,Ray,Petrina,English Lessons,,,Zijie's Timesheet,N/A,80/hr,80/hr,,,,,Pay directly to ZJ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$720.00,$720.00,$0.00,$640,$640,$0,$320,$320,S$0.00,,,$0
+C01,Sufyan,8444 9075,Chermaine,Cheryl/ Tan Yong Guan,S4 Combined Sci (C/B),Blk 161 Bukit Batok st 11 #11-70,,Sufyan's Timesheet,$280.00,45/hr,30/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$270.00,$180.00,$90.00,$450,$300,$150,$270,$180,S$90.00,,,$0
+ET01,Jun Hao,9832 0062,Evander Tan,Sandy/ Lim Xuelin,S4 G2 Combined Sci (B),Blk 501 Jelapang Road #18-414 ,,Jun Hao's Timesheet,$400.00,50/hr,35/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$500.00,$350.00,$150.00,$300,$210,$90,$400,$280,S$120.00,,,$0
+ET02,Cindy,8428 5195,Evander Tan,Sandy/ Lim Xuelin,S4 POA,Blk 501 Jelapang Road #18-414 ,,Cindy's Timesheet,N/A,50/hr,"Zoom: 40/hr
+f2f: 50/hr",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$300.00,$240.00,$60.00,$800,$660,$140,$500,$400,S$100.00,,,$0
+T01,Zijie,9720 5889,Tyra,Cheh Hui Feng,English Lessons,,,Zijie's Timesheet,N/A,"Group: 80/hr
+1 to 1: 120/hr","Group: 80/hr
+1 to 1: 120/hr",,,,,Pay directly to ZJ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$800.00,$800.00,$0.00,$640,$640,$0,$480,$480,S$0.00,,,$0
+G01,Zijie,9720 5889,Georgii,Popov,English Lessons,,,Zijie's Timesheet,N/A,"Group: 80/hr
+1 to 1: 120/hr","Group: 80/hr
+1 to 1: 120/hr",,,,,Pay directly to ZJ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$990.00,$990.00,$0.00,,,,$480,$480,S$0.00,,,$0
+CA01,Zijie,9720 5889,Caelum & Aaden,Joanne,English Lessons,,,Zijie's Timesheet,N/A,"Group: 80/hr
+1 to 1: 120/hr","Group: 80/hr
+1 to 1: 120/hr",,,,,Pay directly to ZJ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"$1,300.00","$1,300.00",$0.00,$330,$330,$0,"$1,230","$1,230",S$0.00,,,$0
+JV01,Guan Wen,9634 2496,Jovan,Lawrence,English Lessons,,,Guan Wen's Timesheet,$360.00,60/hr,50/hr,,,,,,$25.60 (July),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$90,$75,$15,S$900.00,S$750.00,S$150.00,,,$0
+YX01,Zijie,9720 5889,Yang Xin,Judy,S4 English Lessons,,,Zijie's Timesheet,$960.00,"Group: 80/hr
+1 to 1: 120/hr","Group: 80/hr
+1 to 1: 120/hr",,,,,Pay directly to ZJ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,487.9,487.9,S$0.00,,,$0
+ZR01,Zijie,9720 5889,Li Zhi Rui,Yang Su Qiong (wechat),S4 English Lessons,,,Zijie's Timesheet,,"Group: 80/hr
+1 to 1: 120/hr","Group: 80/hr
+1 to 1: 120/hr",,,,,Pay directly to ZJ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,335.8,335.8,S$0.00,,,$0
+ZR02,Guan Wen,9634 2496,Li Zhi Rui,Yang Su Qiong (wechat),S4 English Lessons,,,,,1 to 1: 65/hr,50/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,S$130.00,$100,S$30.00,,,$0
+B01,Shefa,8648 3006,Bernice,Fiona,S3 G2 E math,,,Shefa's Timesheet,,55/hr,45/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,110,90,S$20.00,,,$0
+R01,Shashank,,Rayyan,Stacy,S2 G3 Science,,,,$360.00,45/hr,35/hr,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,Continue,,"Move to
+English
+Academy",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,Pause (Continue 25),,Walter ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,Stopped,,Stopping,,,,,,Not Yet Collected,,,,,,,,,,,,Not Yet Collected,Paid,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,Collected,,,Checklist for Zijie,,,,,,Invoice/Salary Amount (History) (Bold = Paid),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
