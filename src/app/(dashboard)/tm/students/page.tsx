@@ -1,10 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+"use client"
+
+import { StudentList } from "@/components/tm/student-list"
 
 export default function TmStudentsPage() {
   return (
-    <Card>
-      <CardHeader><CardTitle>Students & Assignments</CardTitle></CardHeader>
-      <CardContent className="text-sm text-muted-foreground">Coming in this slice.</CardContent>
-    </Card>
+    <div className="space-y-6">
+      <StudentList />
+    </div>
   )
 }
