@@ -1,10 +1,11 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
+import { resolveRedirect, type Role } from "@/lib/auth/routing"
+import { WORKSPACE_COOKIE, isWorkspace } from "@/lib/workspace"
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const isLoginPage = pathname === "/login"
 
   let supabaseResponse = NextResponse.next({
     request,
@@ -37,17 +38,24 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Not logged in — redirect to login (except if already on login page)
-  if (!user && !isLoginPage) {
-    const url = request.nextUrl.clone()
-    url.pathname = "/login"
-    return NextResponse.redirect(url)
+  let role: Role = "anon"
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle()
+    role = (profile?.role as Role | undefined) ?? "pending"
   }
 
-  // Logged in — redirect away from login page
-  if (user && isLoginPage) {
+  const cookieWorkspace = request.cookies.get(WORKSPACE_COOKIE)?.value
+  const workspace = isWorkspace(cookieWorkspace) ? cookieWorkspace : undefined
+
+  const target = resolveRedirect(role, pathname, workspace)
+  if (target) {
     const url = request.nextUrl.clone()
-    url.pathname = "/"
+    url.pathname = target
+    url.search = ""
     return NextResponse.redirect(url)
   }
 

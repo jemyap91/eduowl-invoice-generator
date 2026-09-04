@@ -20,6 +20,13 @@ cp .env.example .env.local   # then fill in your Supabase credentials
 npm run dev
 ```
 
+Local Supabase reads the Google OAuth env vars from your shell when it starts:
+
+    set -a; source .env.local; set +a
+    npx supabase start
+
+Leave the two Google values empty in `.env.local` if you only need the e2e test users (see `npm run seed:test-users`).
+
 ## User Guide
 
 ### Step 1: Configure Your Academy
