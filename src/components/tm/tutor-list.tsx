@@ -27,6 +27,7 @@ export function TutorList({ refreshKey = 0 }: { refreshKey?: number }) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<TutorRow | null>(null)
   const [saving, setSaving] = useState(false)
+  const [myProfileId, setMyProfileId] = useState<string | null>(null)
   const { toast } = useToast()
 
   const load = useCallback(async () => {
@@ -48,12 +49,16 @@ export function TutorList({ refreshKey = 0 }: { refreshKey?: number }) {
       activeAssignments: counts.get(t.id) || 0,
     }))
     setTutors(rows)
+    const { data: { user } } = await supabase.auth.getUser()
+    setMyProfileId(user?.id ?? null)
     setLoading(false)
   }, [toast])
 
   useEffect(() => { load() }, [load, refreshKey])
 
   const filtered = tutors.filter((t) => t.name.toLowerCase().includes(search.toLowerCase()))
+
+  const iAmLinked = myProfileId !== null && tutors.some((t) => t.profile_id === myProfileId)
 
   async function handleSave(values: TutorFormValues) {
     setSaving(true)
@@ -71,6 +76,19 @@ export function TutorList({ refreshKey = 0 }: { refreshKey?: number }) {
     setDialogOpen(false)
     setEditing(null)
     load()
+  }
+
+  async function linkMyAccount(tutor: TutorRow) {
+    if (!myProfileId) return
+    const supabase = createClient()
+    const { error } = await supabase.from("tm_tutors").update({ profile_id: myProfileId }).eq("id", tutor.id)
+    if (error) {
+      toast({ title: "Error", description: "Failed to link your account", variant: "destructive" })
+      return
+    }
+    toast({ title: "Linked", description: `You are now linked to ${tutor.name}. The tutor portal is in the workspace menu.` })
+    load()
+    window.dispatchEvent(new Event("tm-tutor-link-changed"))
   }
 
   return (
@@ -124,7 +142,18 @@ export function TutorList({ refreshKey = 0 }: { refreshKey?: number }) {
                     <Badge variant={t.status === "active" ? "secondary" : "outline"}>{TUTOR_STATUS_LABELS[t.status]}</Badge>
                   </TableCell>
                   <TableCell>
-                    {t.profiles?.email ? t.profiles.email : <span className="text-muted-foreground">Not linked</span>}
+                    {t.profiles?.email ? (
+                      t.profiles.email
+                    ) : (
+                      <div className="flex items-center gap-1">
+                        <span className="text-muted-foreground">Not linked</span>
+                        {!iAmLinked && myProfileId && (
+                          <Button variant="link" size="sm" className="px-2" onClick={() => linkMyAccount(t)}>
+                            Link my account
+                          </Button>
+                        )}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell className="text-right">{t.activeAssignments}</TableCell>
                   <TableCell>

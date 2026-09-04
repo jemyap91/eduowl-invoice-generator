@@ -3,6 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 import {
   LayoutDashboard, Calendar, ClipboardCheck, GraduationCap, Users, FileText, Settings,
   ChevronsLeft, ChevronsRight, Table2, type LucideIcon,
@@ -39,6 +41,25 @@ function SidebarContent({ onNavClick, collapsed }: { onNavClick?: () => void; co
   const info = WORKSPACES.find((w) => w.id === workspace)!;
   const navItems = NAV_ITEMS[workspace];
 
+  const [showPortal, setShowPortal] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    async function check() {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const { data } = await supabase.from("tm_tutors").select("id").eq("profile_id", user.id).maybeSingle()
+      if (!cancelled) setShowPortal(Boolean(data))
+    }
+    check()
+    window.addEventListener("tm-tutor-link-changed", check)
+    return () => {
+      cancelled = true
+      window.removeEventListener("tm-tutor-link-changed", check)
+    }
+  }, [])
+
   return (
     <>
       {/* Logo area */}
@@ -51,7 +72,7 @@ function SidebarContent({ onNavClick, collapsed }: { onNavClick?: () => void; co
           priority
         />
         <div className="w-full pt-2">
-          <WorkspaceSwitcher current={workspace} collapsed={collapsed} />
+          <WorkspaceSwitcher current={workspace} collapsed={collapsed} showPortal={showPortal} />
         </div>
       </div>
 

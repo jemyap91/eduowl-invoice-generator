@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { WORKSPACES, rememberWorkspace, type Workspace } from "@/lib/workspace"
 
-export function WorkspaceSwitcher({ current, collapsed }: { current: Workspace; collapsed?: boolean }) {
+export function WorkspaceSwitcher({ current, collapsed, showPortal = false }: { current: Workspace; collapsed?: boolean; showPortal?: boolean }) {
   const router = useRouter()
   const active = WORKSPACES.find((w) => w.id === current)!
 
@@ -40,6 +40,11 @@ export function WorkspaceSwitcher({ current, collapsed }: { current: Workspace; 
             {w.id === current && <Check className="h-4 w-4" />}
           </DropdownMenuItem>
         ))}
+        {showPortal && (
+          <DropdownMenuItem onSelect={() => router.push("/portal")}>
+            Tutor portal
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )
