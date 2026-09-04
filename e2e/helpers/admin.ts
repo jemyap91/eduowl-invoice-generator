@@ -4,6 +4,10 @@ function adminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY!
   if (!url || !key) throw new Error("NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set for e2e fixtures")
+  const host = new URL(url).hostname
+  if (!["127.0.0.1", "localhost", "::1", "[::1]"].includes(host)) {
+    throw new Error("Refusing to run e2e fixtures against a non-local Supabase URL")
+  }
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } })
 }
 
@@ -30,4 +34,14 @@ export async function deleteUserByEmail(email: string) {
 
 export async function deleteTutorByName(name: string) {
   await adminClient().from("tm_tutors").delete().eq("name", name)
+}
+
+/** Deletes a student and its assignments (rate tiers cascade). */
+export async function deleteStudentByName(name: string) {
+  const admin = adminClient()
+  const { data: students } = await admin.from("tm_students").select("id").eq("name", name)
+  for (const s of students ?? []) {
+    await admin.from("tm_assignments").delete().eq("student_id", s.id)
+    await admin.from("tm_students").delete().eq("id", s.id)
+  }
 }
