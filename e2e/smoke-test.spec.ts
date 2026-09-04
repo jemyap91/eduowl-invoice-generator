@@ -1,4 +1,9 @@
 import { test, expect } from '@playwright/test'
+import { signIn, users } from "./helpers/auth"
+
+test.beforeEach(async ({ context }) => {
+  await signIn(context, users.admin.email, users.admin.password)
+})
 
 test.describe('Navigation & Page Loading', () => {
   test('dashboard loads without errors', async ({ page }) => {
@@ -12,10 +17,10 @@ test.describe('Navigation & Page Loading', () => {
 
     // Check sidebar is visible on desktop
     await expect(page.getByAltText('EduOwl English Academy').first()).toBeVisible()
-    await expect(page.locator('text=Dashboard')).toBeVisible()
+    await expect(page.locator('text=Dashboard').first()).toBeVisible()
 
     // Check dashboard content renders
-    await expect(page.locator('text=Total Students').or(page.locator('text=Dashboard'))).toBeVisible()
+    await expect(page.locator('text=Total Students').or(page.locator('text=Dashboard')).first()).toBeVisible()
   })
 
   test('all navigation links work', async ({ page }) => {
@@ -35,8 +40,10 @@ test.describe('Navigation & Page Loading', () => {
       await page.locator(`nav >> text=${link.name}`).first().click()
       await page.waitForURL(`**${link.url}`, { timeout: 5000 })
 
-      // Verify no 404 or error page
-      const body = await page.textContent('body')
+      // Verify no 404 or error page. innerText (not textContent) so Next's
+      // embedded RSC flight script (which always serializes a notFound
+      // boundary and literally contains "404") isn't mistaken for a real one.
+      const body = await page.innerText('body')
       expect(body).not.toContain('404')
       expect(body).not.toContain('Application error')
     }
@@ -47,12 +54,14 @@ test.describe('Settings Page', () => {
   test('settings page loads with all tabs', async ({ page }) => {
     await page.goto('/settings')
 
-    // Check all tabs are present
-    await expect(page.locator('text=Subjects')).toBeVisible()
-    await expect(page.locator('text=Streams')).toBeVisible()
-    await expect(page.locator('text=Classrooms')).toBeVisible()
-    await expect(page.locator('text=Payment Methods')).toBeVisible()
-    await expect(page.locator('text=Academy Info')).toBeVisible()
+    // Check all tabs are present. .first() because the active tab's panel
+    // heading repeats the same text as the tab trigger (e.g. Subjects tab +
+    // "Subjects" h3 in its content).
+    await expect(page.locator('text=Subjects').first()).toBeVisible()
+    await expect(page.locator('text=Streams').first()).toBeVisible()
+    await expect(page.locator('text=Classrooms').first()).toBeVisible()
+    await expect(page.locator('text=Payment Methods').first()).toBeVisible()
+    await expect(page.locator('text=Academy Info').first()).toBeVisible()
   })
 
   test('can switch between settings tabs', async ({ page }) => {
@@ -91,8 +100,10 @@ test.describe('Settings Page', () => {
     await page.goto('/settings')
     await page.locator('[role="tab"]:has-text("Academy Info")').click()
 
-    // Should have input fields
-    await expect(page.locator('input[type="text"]').first()).toBeVisible({ timeout: 5000 })
+    // Should have input fields. The Name field's underlying <input> has no
+    // explicit type attribute (shadcn Input passes type through unset), so
+    // match it by its label instead of an input[type="text"] selector.
+    await expect(page.getByLabel('Name')).toBeVisible({ timeout: 5000 })
   })
 })
 
@@ -191,8 +202,8 @@ test.describe('Schedule Page', () => {
   test('ad-hoc session button exists', async ({ page }) => {
     await page.goto('/schedule')
 
-    // Should have an ad-hoc session button
-    const adhocBtn = page.locator('button:has-text("Ad-hoc"), button:has-text("New Session"), button:has-text("Ad-Hoc")')
+    // Should have an ad-hoc session button (the app labels it "Extra Class")
+    const adhocBtn = page.locator('button:has-text("Ad-hoc"), button:has-text("New Session"), button:has-text("Ad-Hoc"), button:has-text("Extra Class")')
     await expect(adhocBtn.first()).toBeVisible({ timeout: 5000 })
   })
 })
