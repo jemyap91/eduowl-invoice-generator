@@ -733,10 +733,13 @@ Claude-Session: https://claude.ai/code/session_01Nz2dMwYkjrRRcXcuVwSWs1"
 Create `src/lib/supabase/admin.ts`:
 
 ```ts
-import "server-only"
 import { createClient } from "@supabase/supabase-js"
 
-/** Service-role client. Server-side only; bypasses RLS. Never import from client components. */
+/**
+ * Service-role client. Server-side only; bypasses RLS.
+ * Only import this from files marked "use server" or from route handlers.
+ * Never import it from a client component: the key would be bundled for the browser.
+ */
 export function createAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -745,7 +748,7 @@ export function createAdminClient() {
 }
 ```
 
-`server-only` is a package that ships with Next.js 14 (`import "server-only"` throws at build time if a client component imports the file). If `npx tsc --noEmit` cannot resolve it, add a `src/types/server-only.d.ts` containing `declare module "server-only"`.
+The `server-only` marker package is not installed in this repo and the plan adds no dependencies, so the guard is the comment plus the rule that only `"use server"` files import this module. The reviewer checks that no client component imports it.
 
 - [ ] **Step 2: Reject server action**
 
