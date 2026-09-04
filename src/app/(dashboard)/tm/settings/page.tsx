@@ -1,10 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { SettingsForm } from "@/components/tm/settings-form"
 
 export default function TmSettingsPage() {
   return (
-    <Card>
-      <CardHeader><CardTitle>Settings</CardTitle></CardHeader>
-      <CardContent className="text-sm text-muted-foreground">Coming in this slice.</CardContent>
-    </Card>
+    <div className="max-w-3xl space-y-6">
+      <SettingsForm />
+    </div>
   )
 }
