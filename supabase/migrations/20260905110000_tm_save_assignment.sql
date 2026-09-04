@@ -20,6 +20,12 @@ BEGIN
   IF p_tiers IS NULL OR jsonb_typeof(p_tiers) <> 'array' OR jsonb_array_length(p_tiers) = 0 THEN
     RAISE EXCEPTION 'An assignment needs at least one rate tier' USING ERRCODE = '22023';
   END IF;
+  IF EXISTS (SELECT 1 FROM jsonb_array_elements(p_tiers) t WHERE COALESCE(btrim(t->>'label'), '') = '') THEN
+    RAISE EXCEPTION 'Every rate tier needs a label' USING ERRCODE = '22023';
+  END IF;
+  IF (SELECT count(*) FROM jsonb_array_elements(p_tiers) t) <> (SELECT count(DISTINCT lower(btrim(t->>'label'))) FROM jsonb_array_elements(p_tiers) t) THEN
+    RAISE EXCEPTION 'Rate tier labels must be unique' USING ERRCODE = '22023';
+  END IF;
 
   IF p_id IS NULL THEN
     INSERT INTO public.tm_assignments (
@@ -43,7 +49,7 @@ BEGIN
       student_id = (p_assignment->>'student_id')::uuid,
       subject = p_assignment->>'subject',
       timeslot = p_assignment->>'timeslot',
-      status = COALESCE(p_assignment->>'status', status),
+      status = COALESCE(p_assignment->>'status', 'active'),
       deposit_amount = (p_assignment->>'deposit_amount')::numeric,
       deposit_status = COALESCE(p_assignment->>'deposit_status', 'none'),
       curriculum_briefed = COALESCE((p_assignment->>'curriculum_briefed')::boolean, false),
