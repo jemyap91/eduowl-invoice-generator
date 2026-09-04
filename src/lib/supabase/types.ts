@@ -1264,6 +1264,15 @@ export type Database = {
       app_role: { Args: never; Returns: string }
       current_tutor_id: { Args: never; Returns: string }
       is_admin: { Args: never; Returns: boolean }
+      tm_approve_signup: {
+        Args: {
+          p_name?: string
+          p_phone?: string
+          p_profile_id: string
+          p_tutor_id?: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       attendance_status: "pending" | "attended" | "absent" | "cancelled"

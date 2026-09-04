@@ -61,23 +61,18 @@ export function PendingSignups({ onChanged }: { onChanged: () => void }) {
     setMode({ kind: "link", profile })
   }
 
-  async function promote(profileId: string) {
-    const supabase = createClient()
-    const { error } = await supabase.from("profiles").update({ role: "tutor" }).eq("id", profileId)
-    return error
-  }
-
   async function handleCreate() {
     if (mode?.kind !== "create" || !name.trim()) return
     setBusy(true)
     const supabase = createClient()
-    const { error: insertError } = await supabase
-      .from("tm_tutors")
-      .insert({ name: name.trim(), phone: phone.trim() || null, profile_id: mode.profile.id })
-    const error = insertError || (await promote(mode.profile.id))
+    const { error } = await supabase.rpc("tm_approve_signup", {
+      p_profile_id: mode.profile.id,
+      p_name: name.trim(),
+      p_phone: phone.trim() || null,
+    })
     setBusy(false)
     if (error) {
-      toast({ title: "Error", description: "Failed to approve signup", variant: "destructive" })
+      toast({ title: "Error", description: error.message || "Failed to approve signup", variant: "destructive" })
       return
     }
     toast({ title: "Approved", description: `${name.trim()} can now use the tutor portal` })
@@ -90,14 +85,13 @@ export function PendingSignups({ onChanged }: { onChanged: () => void }) {
     if (mode?.kind !== "link" || !tutorId) return
     setBusy(true)
     const supabase = createClient()
-    const { error: updateError } = await supabase
-      .from("tm_tutors")
-      .update({ profile_id: mode.profile.id })
-      .eq("id", tutorId)
-    const error = updateError || (await promote(mode.profile.id))
+    const { error } = await supabase.rpc("tm_approve_signup", {
+      p_profile_id: mode.profile.id,
+      p_tutor_id: tutorId,
+    })
     setBusy(false)
     if (error) {
-      toast({ title: "Error", description: "Failed to link signup", variant: "destructive" })
+      toast({ title: "Error", description: error.message || "Failed to link signup", variant: "destructive" })
       return
     }
     toast({ title: "Linked", description: "Tutor account linked" })
