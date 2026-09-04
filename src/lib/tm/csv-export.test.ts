@@ -12,4 +12,11 @@ describe("toCsv", () => {
   it("renders booleans as Yes/No and undefined as empty", () => {
     expect(toCsv(["f"], [[true], [false], [undefined]])).toBe("f\r\nYes\r\nNo\r\n\r\n")
   })
+  it("neutralises cells that a spreadsheet would treat as formulas", () => {
+    expect(toCsv(["v"], [["=SUM(A1)"], ["+1"], ["-x"], ["@cmd"], ["ok"]]))
+      .toBe("v\r\n'=SUM(A1)\r\n'+1\r\n'-x\r\n'@cmd\r\nok\r\n")
+  })
+  it("leaves negative numbers alone and keeps CRLF inside a quoted cell", () => {
+    expect(toCsv(["v"], [[-5], ["a\r\nb"]])).toBe('v\r\n-5\r\n"a\r\nb"\r\n')
+  })
 })

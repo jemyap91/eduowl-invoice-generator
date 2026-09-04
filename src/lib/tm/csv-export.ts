@@ -1,9 +1,13 @@
 export type CsvCell = string | number | boolean | null | undefined
 
+const FORMULA_TRIGGERS = /^[=+\-@\t\r]/
+
 function escapeCell(cell: CsvCell): string {
   if (cell === null || cell === undefined) return ""
   if (typeof cell === "boolean") return cell ? "Yes" : "No"
-  const s = String(cell)
+  if (typeof cell === "number") return String(cell)
+  // Neutralise spreadsheet formula injection: a leading apostrophe makes the cell literal text.
+  const s = FORMULA_TRIGGERS.test(cell) ? `'${cell}` : cell
   return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
 }
 

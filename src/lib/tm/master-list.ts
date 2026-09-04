@@ -144,7 +144,7 @@ export function buildHistoryRows(invoices: TmInvoice[], sources: AssignmentSourc
       if (byPeriod !== 0) return byPeriod
       const byCode = a.code.localeCompare(b.code)
       if (byCode !== 0) return byCode
-      return a.source === "manual" ? -1 : b.source === "manual" ? 1 : 0
+      return a.source === b.source ? 0 : a.source === "manual" ? -1 : 1
     })
 }
 
