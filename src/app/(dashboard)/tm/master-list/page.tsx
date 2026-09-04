@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { fetchAll } from "@/lib/supabase/fetch-all"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
@@ -40,15 +41,15 @@ export default function TmMasterListPage() {
     setLoading(true)
     const supabase = createClient()
     const [assignmentsRes, invoicesRes] = await Promise.all([
-      supabase.from("tm_assignments").select("*, tm_tutors(id, name, phone), tm_students(id, name, parent_name, address), tm_rate_tiers(*)").order("code"),
-      supabase.from("tm_invoices").select("*"),
+      fetchAll<RawAssignment>(() => supabase.from("tm_assignments").select("*, tm_tutors(id, name, phone), tm_students(id, name, parent_name, address), tm_rate_tiers(*)").order("code")),
+      fetchAll<TmInvoice>(() => supabase.from("tm_invoices").select("*").order("id")),
     ])
     if (assignmentsRes.error || invoicesRes.error) {
       toast({ title: "Error", description: "Failed to load the master list", variant: "destructive" })
       setLoading(false)
       return
     }
-    setSources(((assignmentsRes.data as unknown as RawAssignment[]) || []).map((r) => {
+    setSources(assignmentsRes.data.map((r) => {
       const { tm_tutors, tm_students, tm_rate_tiers, ...assignment } = r
       return {
         assignment: {
@@ -65,7 +66,7 @@ export default function TmMasterListPage() {
         })),
       }
     }))
-    setInvoices(((invoicesRes.data as unknown as TmInvoice[]) || []).map((i) => ({
+    setInvoices(invoicesRes.data.map((i) => ({
       ...i,
       total_hours: toNumber(i.total_hours as unknown as string),
       invoice_amount: toNumber(i.invoice_amount as unknown as string) ?? 0,

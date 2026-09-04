@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { fetchAll } from "@/lib/supabase/fetch-all"
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
@@ -28,11 +29,11 @@ export default function TmStudentsPage() {
     const supabase = createClient()
     const [tutorsRes, assignmentsRes, settingsRes] = await Promise.all([
       supabase.from("tm_tutors").select("*").order("name"),
-      supabase.from("tm_assignments").select("code, subject"),
+      fetchAll<{ code: string; subject: string }>(() => supabase.from("tm_assignments").select("code, subject").order("code")),
       supabase.from("tm_settings").select("default_rate_tiers").limit(1).maybeSingle(),
     ])
     setTutors((tutorsRes.data as TmTutor[]) || [])
-    const rows = assignmentsRes.data || []
+    const rows = assignmentsRes.data
     setAllCodes(rows.map((r) => r.code))
     setSubjects(Array.from(new Set(rows.map((r) => r.subject))).sort())
     setDefaultTiers(draftsFromValues(parseDefaultTiers(settingsRes.data?.default_rate_tiers)))
