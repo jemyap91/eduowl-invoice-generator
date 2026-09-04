@@ -3,6 +3,7 @@
 **Date:** 2026-09-04
 **Status:** Approved in brainstorming, pending user review of this document
 **Source spec:** `docs/reference/eduowl-tutor-matching-spec.md` (product brief), `docs/reference/Tutor Matching (Invoicing) - Demo New MasterList.csv` (current Google Sheet export)
+**Brand collateral:** `docs/reference/tutor_matching_logo.pdf` and `tutor_matching_logo_dark.jpg` (cartoon owl), `docs/reference/Tutor Matching (Invoicing) - Mr Eric Invoice CAA 9.9_tutor_matching.pdf` (invoice template to match), `docs/reference/color_palette_eduowl.jpg` and `Yang Xin_July_eduowl.pdf` (Academy brand, for the later rebrand)
 
 ## 1. Summary
 
@@ -14,7 +15,8 @@ The existing Academy screens are untouched in this round. They stay Pegasus-bran
 
 | Topic | Decision |
 |---|---|
-| Sign-in | Google OAuth via Supabase Auth, for admin and tutors. Email/password form and demo bypass removed. |
+| Sign-in | Google OAuth via Supabase Auth, for admins and tutors. Email/password form and demo bypass removed. |
+| Admins | Two, seeded by email: `zijieynwa@gmail.com` and `ccchristabelle@gmail.com`. An admin can also be linked to a tutor profile and use the tutor portal. |
 | Tutor onboarding | Open signup. New Google accounts land as `pending`; admin approves from a pending list and links them to a tutor profile. |
 | Academy rebrand | Out of scope. Switcher plus new module only. |
 | Deposits | Informational: amount and collected status on the assignment. Never offsets an invoice. |
@@ -46,9 +48,10 @@ New table `profiles`:
 | role | text | `pending`, `tutor`, `admin` |
 | created_at | timestamptz | |
 
-- A trigger on `auth.users` insert creates the profile with `role = 'pending'`, except when the email matches the seeded admin email, which gets `admin`.
-- The admin email is seeded in a migration. It is the only admin in v1.
+- A trigger on `auth.users` insert creates the profile with `role = 'pending'`, except when the email is in the `admin_emails` table, which gets `admin`.
+- `admin_emails` is seeded in a migration with `zijieynwa@gmail.com` and `ccchristabelle@gmail.com`. Adding an admin later is a one-row insert.
 - `tm_tutors.profile_id` links a tutor to a profile. Approving a pending user sets `role = 'tutor'` and either creates a `tm_tutors` row or links an existing unlinked one.
+- An admin can also be linked to a `tm_tutors` row (Zijie tutors as well as administers). The Tutors screen offers "Link my account" on any unlinked tutor. Admins with a linked tutor row see a "Tutor portal" entry in the workspace switcher.
 - A SQL helper `app_role()` (security definer, reads `profiles.role` for `auth.uid()`) is used by every RLS policy.
 
 ### Routing by role (middleware)
@@ -60,20 +63,20 @@ The existing middleware keeps its session check and adds one profile lookup:
 | no session | `/login`, `/auth/callback` | `/login` |
 | pending | `/pending` | `/pending` |
 | tutor | `/portal/*` | `/portal` |
-| admin | all routes except `/portal/*` | `/` or `/tm` per workspace cookie |
+| admin | all routes, including `/portal/*` when linked to a tutor | `/` or `/tm` per workspace cookie |
 
 `/pending` shows "Thanks for signing up. EduOwl will approve your account shortly." with a sign-out button.
 
 ### Workspace switcher (admin)
 
-- Dropdown at the top of the sidebar with two entries: **EduOwl English Academy** (existing routes, unchanged) and **EduOwl Tutor Matching** (`/tm/*`).
+- Dropdown at the top of the sidebar with two entries: **EduOwl English Academy** (existing routes, unchanged, still Pegasus-branded this round) and **Tutor Matching** (`/tm/*`). A third entry, **Tutor portal**, appears for admins linked to a tutor row.
 - Selected workspace is stored in a cookie `workspace=academy|tm`. Landing on `/` with `workspace=tm` redirects to `/tm`.
 - Sidebar nav items are chosen by workspace. Tutor Matching items: Dashboard `/tm`, Pending Approvals `/tm/approvals`, Invoices `/tm/invoices`, Tutors `/tm/tutors`, Students & Assignments `/tm/students`, Master List `/tm/master-list`, Settings `/tm/settings`.
 - Header page titles extend to the new routes.
 
 ### Tutor portal layout
 
-- Route group `src/app/portal/*` with its own layout: top bar (EduOwl Tutor Matching, tutor name, sign out) and three tabs: My Students `/portal`, Log a Session `/portal/log`, My Timesheet `/portal/timesheet`.
+- Route group `src/app/portal/*` with its own layout: top bar (cartoon owl logo, "EduOwl Tutor Matching", tutor name, sign out) and three tabs: My Students `/portal`, Log a Session `/portal/log`, My Timesheet `/portal/timesheet`.
 - No sidebar. Mobile-first; tutors use it on phones.
 
 ## 3. Data model
@@ -211,7 +214,17 @@ Unique on `(assignment_id, year, month, source)` so a generated invoice and a ma
 
 ### `tm_settings`
 
-Single row: `company_name text`, `payment_details text` (bank/PayNow text for the WhatsApp message), `default_rate_tiers jsonb` (array of `{label, parent_rate, tutor_rate}` used to prefill new assignments).
+Single row, seeded from the invoice template:
+
+| column | seed value |
+|---|---|
+| company_name | `EduOwl` |
+| legal_name | `Education Consultancy Pte. Ltd.` |
+| payment_terms | `Payment to be made addressed to EDUOWL EDUCATION CONSULTANCY PTE. LTD. within 7 days of invoice` |
+| paynow_uen | `202411710M` |
+| qr_code_path | `/tm/paynow-qr.png` |
+| payment_details | `PayNow UEN 202411710M` (used in the WhatsApp text) |
+| default_rate_tiers | `[]`, jsonb array of `{label, parent_rate, tutor_rate}` used to prefill new assignments |
 
 ### Row Level Security
 
@@ -286,14 +299,21 @@ Amount due: ${invoice_amount}
 
 Payment details: {tm_settings.payment_details}
 
-Thank you! — {tm_settings.company_name}
+Thank you! — EduOwl Tutor Matching
 ```
 
 Built in `src/lib/tm/whatsapp.ts`, copied with the Clipboard API.
 
 ### PDF
 
-The existing `invoice-pdf.tsx` is generalised: header name from `tm_settings.company_name`, no logo when none is configured, line items as date, tier, hours, rate, total. Tutor payout never appears.
+A new `src/components/tm/invoice-pdf.tsx`, built from the existing Academy PDF component but matching the Mr Eric template in `docs/reference`:
+
+- Navy top bar (`#2E3192`), "EduOwl" large with "Education Consultancy Pte. Ltd." beneath, cartoon owl logo top right (`public/tm/logo.png`, converted from `tutor_matching_logo.pdf`).
+- "Invoice for: {parent_name}" with the student's address beneath, then "{student_name}, {Month Year}".
+- Table: Description, Hours, Hourly Rate, Total price. One line per rate tier used, described as "{student_name} {subject} ({tier_label})". Manual invoices show a single line with the amount.
+- Payment Methods block: payment terms text, "By PAYNOW: UEN {paynow_uen}", "By QR:" with the QR image from `qr_code_path`.
+- Subtotal and a large total in the bottom right.
+- Tutor payout never appears.
 
 ### Tutors (`/tm/tutors`)
 
@@ -314,7 +334,11 @@ Two tabs, both sortable, filterable, with CSV export.
 
 ### Settings (`/tm/settings`)
 
-Company name, payment details, default rate tier template.
+Every `tm_settings` column: company name, legal name, payment terms, PayNow UEN, payment details text, default rate tier template. The QR image is a static file in `public/tm/`, replaced by redeploying.
+
+### Branding
+
+Tutor Matching uses the cartoon owl logo and the navy accent from the invoice template for its sidebar header, portal top bar, and PDF. The Academy workspace keeps the current Pegasus teal and logo until the separate rebrand. Both share the shadcn component set, so only the logo image and a CSS variable differ per workspace.
 
 ## 6. Sheet import
 
@@ -358,8 +382,9 @@ Each slice is deployable on its own.
 3. In Supabase Dashboard, Authentication, Providers, enable Google and paste the client ID and secret.
 4. In Supabase Dashboard, Authentication, URL Configuration, add the Vercel production URL and `https://*-<team>.vercel.app/**` to Redirect URLs, plus `http://localhost:3000/**`.
 5. In Vercel, set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` (server-only, used by the reject-signup action and the import script).
-6. Set the admin email in the seed migration before the first `db push`.
+6. Supply the PayNow QR image as `public/tm/paynow-qr.png`. The one in the Mr Eric template PDF is extracted during implementation if the tooling allows; otherwise export it from the original invoice document.
 7. Run `npm run import:master-list` once.
+8. Sign in with each admin Google account once, then link Zijie's account to the imported "Zijie" tutor row from the Tutors screen.
 
 ## 11. Out of scope for v1
 
@@ -367,5 +392,4 @@ Each slice is deployable on its own.
 - Payment gateway or bank reconciliation.
 - Deposit offsetting.
 - Tutor-visible payout status.
-- Academy rebrand to EduOwl.
-- More than one admin account.
+- Academy rebrand to EduOwl (collateral is in `docs/reference` for when that happens).
