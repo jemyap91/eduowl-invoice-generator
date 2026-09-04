@@ -1,12 +1,22 @@
 {
-  "name": "pegasus-learning-academy",
+  "name": "eduowl",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:test": "supabase test db",
+    "db:types": "supabase gen types typescript --local > src/lib/supabase/types.ts",
+    "seed:test-users": "node --env-file=.env.local --import tsx scripts/seed-test-users.ts",
+    "import:master-list": "node --env-file=.env.local --import tsx scripts/import-master-list.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -51,6 +61,9 @@
     "postcss": "^8",
     "supabase": "^2.77.0",
     "tailwindcss": "^3.4.13",
-    "typescript": "^5"
+    "tsx": "^4.23.13",
+    "typescript": "^5",
+    "vite": "^8.2.2",
+    "vitest": "^5.0.0"
   }
 }
