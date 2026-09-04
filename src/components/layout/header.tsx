@@ -5,20 +5,12 @@ import { format } from "date-fns";
 import { Menu, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
-
-const pageTitles: Record<string, string> = {
-  "/": "Dashboard",
-  "/schedule": "Schedule",
-  "/students": "Students & Parents",
-  "/tutors": "Tutors",
-  "/invoices": "Invoices",
-  "/settings": "Settings",
-};
+import { pageTitle } from "@/lib/workspace";
 
 export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
-  const title = pageTitles[pathname] ?? "Dashboard";
+  const title = pageTitle(pathname);
   const today = format(new Date(), "EEEE, d MMMM yyyy");
 
   async function handleLogout() {

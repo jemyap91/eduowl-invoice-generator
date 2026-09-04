@@ -4,15 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
-  Calendar,
-  ClipboardCheck,
-  GraduationCap,
-  Users,
-  FileText,
-  Settings,
-  ChevronsLeft,
-  ChevronsRight,
+  LayoutDashboard, Calendar, ClipboardCheck, GraduationCap, Users, FileText, Settings,
+  ChevronsLeft, ChevronsRight, type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -25,41 +18,47 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { NAV_ITEMS, WORKSPACES, workspaceFromPathname, isNavActive } from "@/lib/workspace";
+import { WorkspaceSwitcher } from "./workspace-switcher";
 
-const navItems = [
-  { label: "Dashboard", href: "/", icon: LayoutDashboard },
-  { label: "Schedule", href: "/schedule", icon: Calendar },
-  { label: "Attendance", href: "/attendance", icon: ClipboardCheck },
-  { label: "Students & Parents", href: "/students", icon: GraduationCap },
-  { label: "Tutors", href: "/tutors", icon: Users },
-  { label: "Invoices", href: "/invoices", icon: FileText },
-  { label: "Settings", href: "/settings", icon: Settings },
-];
+const ICONS: Record<string, LucideIcon> = {
+  Dashboard: LayoutDashboard,
+  Schedule: Calendar,
+  Attendance: ClipboardCheck,
+  "Students & Parents": GraduationCap,
+  Tutors: Users,
+  Invoices: FileText,
+  Settings: Settings,
+};
 
 function SidebarContent({ onNavClick, collapsed }: { onNavClick?: () => void; collapsed?: boolean }) {
   const pathname = usePathname();
+  const workspace = workspaceFromPathname(pathname);
+  const info = WORKSPACES.find((w) => w.id === workspace)!;
+  const navItems = NAV_ITEMS[workspace];
 
   return (
     <>
       {/* Logo area */}
       <div className={cn("flex flex-col items-center gap-2 py-6", collapsed ? "px-2" : "px-4")}>
         <Image
-          src="/academy/logo.png"
-          alt="EduOwl English Academy"
-          width={collapsed ? 44 : 200}
-          height={collapsed ? 25 : 113}
+          src={info.logo}
+          alt={info.label}
+          width={collapsed ? 44 : info.logoWidth}
+          height={collapsed ? 44 : info.logoHeight}
           priority
         />
+        <div className="w-full pt-2">
+          <WorkspaceSwitcher current={workspace} collapsed={collapsed} />
+        </div>
       </div>
 
       {/* Navigation */}
       <nav className={cn("flex-1", collapsed ? "px-2" : "px-3")}>
         <ul className="space-y-1">
           {navItems.map((item) => {
-            const isActive =
-              item.href === "/"
-                ? pathname === "/"
-                : pathname.startsWith(item.href);
+            const isActive = isNavActive(item.href, pathname);
+            const Icon = ICONS[item.label] ?? LayoutDashboard;
 
             const linkContent = (
               <Link
@@ -74,7 +73,7 @@ function SidebarContent({ onNavClick, collapsed }: { onNavClick?: () => void; co
                     : "border-l-[3px] border-transparent text-muted-foreground"
                 )}
               >
-                <item.icon className="h-5 w-5 shrink-0" />
+                <Icon className="h-5 w-5 shrink-0" />
                 {!collapsed && item.label}
               </Link>
             );

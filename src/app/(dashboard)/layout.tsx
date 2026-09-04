@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Sidebar, MobileSidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
+import { workspaceFromPathname } from "@/lib/workspace";
 
 export default function DashboardLayout({
   children,
@@ -11,9 +13,11 @@ export default function DashboardLayout({
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const pathname = usePathname();
+  const workspace = workspaceFromPathname(pathname);
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen" data-workspace={workspace}>
       <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
       <MobileSidebar open={mobileOpen} onOpenChange={setMobileOpen} />
       <div className="flex-1 flex flex-col overflow-hidden">
