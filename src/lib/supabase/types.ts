@@ -1273,6 +1273,10 @@ export type Database = {
         }
         Returns: string
       }
+      tm_save_assignment: {
+        Args: { p_assignment: Json; p_id: string; p_tiers: Json }
+        Returns: string
+      }
     }
     Enums: {
       attendance_status: "pending" | "attended" | "absent" | "cancelled"

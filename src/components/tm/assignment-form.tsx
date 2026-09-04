@@ -90,7 +90,7 @@ export function AssignmentForm({
       timeslot: timeslot.trim(),
       status,
       deposit_amount: deposit,
-      deposit_status: deposit === null ? "none" : depositStatus === "none" ? "collected" : depositStatus,
+      deposit_status: deposit === null ? "none" : depositStatus === "none" ? "not_collected" : depositStatus,
       curriculum_briefed: briefed,
       group_chat_created: chat,
       post_trial_checkin_done: trial,
@@ -149,7 +149,10 @@ export function AssignmentForm({
         </div>
         <div className="space-y-2">
           <Label htmlFor="tm-asg-deposit">Deposit ($)</Label>
-          <Input id="tm-asg-deposit" inputMode="decimal" value={depositAmount} onChange={(e) => setDepositAmount(e.target.value)} placeholder="Leave blank for none" />
+          <Input id="tm-asg-deposit" inputMode="decimal" value={depositAmount} onChange={(e) => {
+            setDepositAmount(e.target.value)
+            if (e.target.value.trim() && depositStatus === "none") setDepositStatus("not_collected")
+          }} placeholder="Leave blank for none" />
         </div>
         <div className="space-y-2">
           <Label htmlFor="tm-asg-deposit-status">Deposit status</Label>

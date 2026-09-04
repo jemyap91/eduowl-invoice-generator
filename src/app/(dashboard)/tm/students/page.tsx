@@ -68,45 +68,21 @@ export default function TmStudentsPage() {
       remarks: values.remarks || null,
     }
 
-    let assignmentId: string
-    if (target.assignment) {
-      const { error } = await supabase.from("tm_assignments").update(payload).eq("id", target.assignment.id)
-      if (error) {
-        setSaving(false)
-        toast({ title: "Error", description: error.code === "23505" ? "That code is already in use." : "Failed to update assignment", variant: "destructive" })
-        return
-      }
-      assignmentId = target.assignment.id
-    } else {
-      const { data, error } = await supabase.from("tm_assignments").insert(payload).select("id").single()
-      if (error || !data) {
-        setSaving(false)
-        toast({ title: "Error", description: error?.code === "23505" ? "That code is already in use." : "Failed to add assignment", variant: "destructive" })
-        return
-      }
-      assignmentId = data.id
-    }
-
-    // Tiers: upsert by (assignment_id, label) so unchanged labels keep their ids, then drop removed labels.
-    const { error: tierError } = await supabase
-      .from("tm_rate_tiers")
-      .upsert(values.tiers.map((t) => ({ ...t, assignment_id: assignmentId })), { onConflict: "assignment_id,label" })
-    if (tierError) {
-      setSaving(false)
-      toast({ title: "Error", description: "Assignment saved but rate tiers failed", variant: "destructive" })
-      return
-    }
-    const keepLabels = values.tiers.map((t) => t.label)
-    const { error: pruneError } = await supabase
-      .from("tm_rate_tiers")
-      .delete()
-      .eq("assignment_id", assignmentId)
-      .not("label", "in", `(${keepLabels.map((l) => `"${l.replace(/"/g, '\\"')}"`).join(",")})`)
+    const { data, error } = await supabase.rpc("tm_save_assignment", {
+      p_id: target.assignment?.id ?? null,
+      p_assignment: payload,
+      p_tiers: values.tiers,
+    })
     setSaving(false)
-    if (pruneError) {
-      toast({ title: "Error", description: "Assignment saved but an old rate tier could not be removed", variant: "destructive" })
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.code === "23505" ? "That code is already in use." : error.message || "Failed to save assignment",
+        variant: "destructive",
+      })
       return
     }
+    void data
     toast({ title: "Success", description: target.assignment ? "Assignment updated" : `Assignment ${values.code} added` })
     setTarget(null)
     setRefreshKey((k) => k + 1)
