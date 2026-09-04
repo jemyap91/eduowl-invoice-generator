@@ -1,6 +1,6 @@
 BEGIN;
 CREATE EXTENSION IF NOT EXISTS pgtap WITH SCHEMA extensions;
-SELECT plan(16);
+SELECT plan(20);
 
 -- Two tutor logins and one admin
 INSERT INTO auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
@@ -29,6 +29,8 @@ INSERT INTO tm_timesheet_entries (id, assignment_id, tutor_id, date, hours, tier
   ('60000000-0000-0000-0000-000000000003', '30000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000002', current_date, 1, '1 to 1', 80, 60, 'draft');
 INSERT INTO tm_invoices (assignment_id, year, month, source, invoice_amount, tutor_payout)
   VALUES ('30000000-0000-0000-0000-000000000001', 2026, 8, 'manual', 700, 500);
+INSERT INTO tm_entry_edits (entry_id, previous)
+  VALUES ('60000000-0000-0000-0000-000000000002', '{"hours": 1}'::jsonb);
 
 -- ---- Act as Tutor A ----
 SET LOCAL role authenticated;
@@ -67,9 +69,22 @@ SELECT is((SELECT hours FROM tm_timesheet_entries WHERE id = '60000000-0000-0000
 UPDATE tm_timesheet_entries SET hours = 3 WHERE id = '60000000-0000-0000-0000-000000000001';
 SELECT is((SELECT hours FROM tm_timesheet_entries WHERE id = '60000000-0000-0000-0000-000000000001'), 3.00::numeric, 'tutor can update a draft entry');
 
+-- Cannot re-target an entry to another tutor's assignment (WITH CHECK violation raises)
+SELECT throws_ok(
+  $$ UPDATE tm_timesheet_entries SET assignment_id = '30000000-0000-0000-0000-000000000002'
+     WHERE id = '60000000-0000-0000-0000-000000000001' $$,
+  '42501', NULL, 'tutor cannot move an entry to another tutor''s assignment');
+-- Audit log is invisible to tutors
+SELECT is((SELECT count(*)::int FROM tm_entry_edits), 0, 'tutor cannot read entry edits');
+-- Delete: submitted entries are untouchable, drafts are deletable
+DELETE FROM tm_timesheet_entries WHERE id = '60000000-0000-0000-0000-000000000002';
+SELECT is((SELECT count(*)::int FROM tm_timesheet_entries WHERE id = '60000000-0000-0000-0000-000000000002'), 1, 'tutor cannot delete a submitted entry');
+DELETE FROM tm_timesheet_entries WHERE id = '60000000-0000-0000-0000-000000000001';
+SELECT is((SELECT count(*)::int FROM tm_timesheet_entries WHERE id = '60000000-0000-0000-0000-000000000001'), 0, 'tutor can delete a draft entry');
+
 -- ---- Act as admin ----
 SET LOCAL request.jwt.claims = '{"sub":"a0000000-0000-0000-0000-000000000009","role":"authenticated"}';
-SELECT is((SELECT count(*)::int FROM tm_timesheet_entries), 4, 'admin sees every entry');
+SELECT is((SELECT count(*)::int FROM tm_timesheet_entries), 3, 'admin sees every entry');
 
 SELECT * FROM finish();
 ROLLBACK;

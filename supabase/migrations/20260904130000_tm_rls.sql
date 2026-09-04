@@ -84,7 +84,14 @@ CREATE POLICY tutor_insert_draft_on_active_assignment ON tm_timesheet_entries FO
 
 CREATE POLICY tutor_update_editable_entries ON tm_timesheet_entries FOR UPDATE TO authenticated
   USING (tutor_id = public.current_tutor_id() AND status IN ('draft', 'returned'))
-  WITH CHECK (tutor_id = public.current_tutor_id() AND status IN ('draft', 'returned'));
+  WITH CHECK (
+    tutor_id = public.current_tutor_id()
+    AND status IN ('draft', 'returned')
+    AND EXISTS (
+      SELECT 1 FROM tm_assignments a
+      WHERE a.id = assignment_id AND a.tutor_id = public.current_tutor_id()
+    )
+  );
 
 CREATE POLICY tutor_delete_editable_entries ON tm_timesheet_entries FOR DELETE TO authenticated
   USING (tutor_id = public.current_tutor_id() AND status IN ('draft', 'returned'));
