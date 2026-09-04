@@ -19,12 +19,14 @@ export function SortableHeader<K extends string>({ column, label, sortKey, sortD
   const active = sortKey === column
   const Icon = !active ? ArrowUpDown : sortDir === "asc" ? ArrowUp : ArrowDown
   return (
-    <TableHead className={cn("whitespace-nowrap", align === "right" && "text-right", className)}>
+    <TableHead
+      className={cn("whitespace-nowrap", align === "right" && "text-right", className)}
+      aria-sort={active ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
+    >
       <button
         type="button"
         onClick={() => onSort(column)}
         className={cn("inline-flex items-center gap-1 hover:text-foreground", active && "text-foreground font-semibold")}
-        aria-sort={active ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
       >
         {label}
         <Icon className="h-3 w-3" />
