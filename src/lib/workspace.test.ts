@@ -33,4 +33,13 @@ describe("NAV_ITEMS", () => {
       expect(NAV_ITEMS[ws.id][0]).toMatchObject({ label: "Dashboard", href: ws.home })
     }
   })
+  it("lists the tutor matching admin screens in order", () => {
+    expect(NAV_ITEMS.tm.map((i) => [i.label, i.href])).toEqual([
+      ["Dashboard", "/tm"],
+      ["Tutors", "/tm/tutors"],
+      ["Students & Assignments", "/tm/students"],
+      ["Master List", "/tm/master-list"],
+      ["Settings", "/tm/settings"],
+    ])
+  })
 })

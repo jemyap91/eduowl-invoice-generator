@@ -5,7 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Calendar, ClipboardCheck, GraduationCap, Users, FileText, Settings,
-  ChevronsLeft, ChevronsRight, type LucideIcon,
+  ChevronsLeft, ChevronsRight, Table2, type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -29,6 +29,8 @@ const ICONS: Record<string, LucideIcon> = {
   Tutors: Users,
   Invoices: FileText,
   Settings: Settings,
+  "Students & Assignments": GraduationCap,
+  "Master List": Table2,
 };
 
 function SidebarContent({ onNavClick, collapsed }: { onNavClick?: () => void; collapsed?: boolean }) {
