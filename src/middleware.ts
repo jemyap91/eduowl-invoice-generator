@@ -56,7 +56,9 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone()
     url.pathname = target
     url.search = ""
-    return NextResponse.redirect(url)
+    const redirect = NextResponse.redirect(url)
+    supabaseResponse.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie))
+    return redirect
   }
 
   return supabaseResponse

@@ -25,7 +25,7 @@ Local Supabase reads the Google OAuth env vars from your shell when it starts:
     set -a; source .env.local; set +a
     npx supabase start
 
-Leave the two Google values empty in `.env.local` if you only need the e2e test users (see `npm run seed:test-users`).
+Google sign-in is disabled in the local config by default so the stack starts without credentials; the e2e suite signs in with password-grant test users (`npm run seed:test-users`). To test Google locally, put real values in `.env.local`, set `enabled = true` under `[auth.external.google]` in `supabase/config.toml`, and restart the stack.
 
 ## User Guide
 
