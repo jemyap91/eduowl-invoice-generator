@@ -245,7 +245,7 @@ function AssignmentsTable({
     <div className="px-4 py-3 space-y-2">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium">Assignments</span>
-        <Button size="sm" variant="outline" onClick={() => onAdd?.(student)} disabled={!onAdd} title={onAdd ? undefined : "Coming in the next task"}>
+        <Button size="sm" variant="outline" onClick={() => onAdd?.(student)}>
           <Plus className="mr-2 h-4 w-4" />Add assignment
         </Button>
       </div>
@@ -274,7 +274,7 @@ function AssignmentsTable({
                 <TableCell className="text-xs">{formatTierSummary(a.tm_rate_tiers) || "-"}</TableCell>
                 <TableCell><Badge variant={a.status === "active" ? "secondary" : "outline"}>{ASSIGNMENT_STATUS_LABELS[a.status]}</Badge></TableCell>
                 <TableCell>
-                  <Button variant="ghost" size="icon" aria-label={`Edit assignment ${a.code}`} onClick={() => onEdit?.(a, student)} disabled={!onEdit}>
+                  <Button variant="ghost" size="icon" aria-label={`Edit assignment ${a.code}`} onClick={() => onEdit?.(a, student)}>
                     <Pencil className="h-4 w-4" />
                   </Button>
                 </TableCell>
