@@ -3548,3 +3548,12 @@ Claude-Session: https://claude.ai/code/session_01Nz2dMwYkjrRRcXcuVwSWs1"
 ## After this plan
 
 Slice 3 (tutor portal) follows. Its first task must add `tm_timesheet_entries_tutor_view` (every column except `parent_rate`, filtered by `current_tutor_id()`, revoked from `anon`/`public`, `security_barrier`) with a `hasnt_column` test, and the portal must read entries only through it; see the carry-forward section of the slice 1 plan.
+
+## Carry-forward from slice 2 execution
+
+- **Slice 3, first task (with the entries masking view):** apply the generated `Database` type to `createClient()` in `src/lib/supabase/client.ts` and `server.ts`, then delete the `as unknown as` casts in the `tm` screens (keep `toNumber` for numeric-string coercion). Every `tm_` query is currently untyped.
+- Rate tiers are identified by label: `tm_save_assignment` upserts on `(assignment_id, label)` and prunes removed labels. Renaming a tier deletes and re-creates it, which nulls `rate_tier_id` on entries that referenced it (rates survive in the snapshot columns). Slice 3's Log-a-Session and edit flows must handle a draft entry whose `rate_tier_id` is null by asking the tutor to pick a tier again; `tm_snapshot_entry_rates` requires `rate_tier_id` on tutor writes.
+- `tm_approve_signup` and `tm_save_assignment` are the pattern for later multi-row writes (`tm_submit_month`, `tm_approve_submission`): SECURITY DEFINER, `app_role()` check first, `REVOKE ... FROM public, anon`, pgTAP with a tutor-role negative case.
+- Lists that can exceed 1000 rows go through `fetchAll()` from `src/lib/supabase/fetch-all.ts` (offset paging; fine for admin screens, not for concurrent-write reports).
+- The `/tm/students` page still ignores a failed lookup load (no toast); the pgTAP fixtures hard-code the seeded admin email, so `npm run db:test` must follow `supabase db reset`.
+- An admin linked to a tutor row acts as that tutor in slices 3 and 4; the audit trail (`tm_entry_edits.edited_by`) records the profile, which is enough to tell them apart.
