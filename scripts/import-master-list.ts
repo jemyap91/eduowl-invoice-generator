@@ -3,6 +3,14 @@ import path from "path"
 import { createClient } from "@supabase/supabase-js"
 import { parseMasterList, type ImportedAssignment } from "../src/lib/tm/import/master-list"
 
+/**
+ * One-off loader for the Tutor Matching master list export.
+ *
+ * Idempotent on assignment code: rerunning updates existing rows. Note that a
+ * rerun overwrites every imported field from the CSV, including remarks, so
+ * run it before admins start editing assignments in the app, not after.
+ */
+
 const DEFAULT_FILE = path.resolve(__dirname, "../docs/reference/Tutor Matching (Invoicing) - Demo New MasterList.csv")
 const CODE_OVERRIDES: Record<string, string> = { "R01:Rayyan": "RY01" }
 
@@ -31,15 +39,21 @@ async function main() {
     return
   }
 
+  console.log(`Writing to ${url}`)
+
   const supabase = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } })
 
   // Tutors by name
   const tutorIds = new Map<string, string>()
   for (const name of tutorNames) {
     const phone = assignments.find((a) => a.tutor_name === name && a.tutor_phone)?.tutor_phone ?? null
-    const { data: existing } = await supabase.from("tm_tutors").select("id").eq("name", name).maybeSingle()
+    const { data: existing, error: lookupError } = await supabase.from("tm_tutors").select("id").eq("name", name).maybeSingle()
+    if (lookupError) throw lookupError
     if (existing) {
-      if (phone) await supabase.from("tm_tutors").update({ phone }).eq("id", existing.id)
+      if (phone) {
+        const { error } = await supabase.from("tm_tutors").update({ phone }).eq("id", existing.id)
+        if (error) throw error
+      }
       tutorIds.set(name, existing.id)
     } else {
       const { data, error } = await supabase.from("tm_tutors").insert({ name, phone }).select("id").single()
@@ -55,10 +69,12 @@ async function main() {
     if (studentIds.has(k)) continue
     let q = supabase.from("tm_students").select("id").eq("name", a.student_name)
     q = a.parent_name ? q.eq("parent_name", a.parent_name) : q.is("parent_name", null)
-    const { data: existing } = await q.maybeSingle()
+    const { data: existing, error: lookupError } = await q.maybeSingle()
+    if (lookupError) throw lookupError
     const fields = { name: a.student_name, parent_name: a.parent_name, address: a.address }
     if (existing) {
-      await supabase.from("tm_students").update(fields).eq("id", existing.id)
+      const { error } = await supabase.from("tm_students").update(fields).eq("id", existing.id)
+      if (error) throw error
       studentIds.set(k, existing.id)
     } else {
       const { data, error } = await supabase.from("tm_students").insert(fields).select("id").single()
@@ -71,7 +87,8 @@ async function main() {
   let created = 0, updated = 0, invoicesWritten = 0
   for (const a of assignments) {
     const row = assignmentRow(a, tutorIds.get(a.tutor_name)!, studentIds.get(`${a.student_name}|${a.parent_name ?? ""}`)!)
-    const { data: existing } = await supabase.from("tm_assignments").select("id").eq("code", a.code).maybeSingle()
+    const { data: existing, error: lookupError } = await supabase.from("tm_assignments").select("id").eq("code", a.code).maybeSingle()
+    if (lookupError) throw lookupError
     let assignmentId: string
     if (existing) {
       const { error } = await supabase.from("tm_assignments").update(row).eq("id", existing.id)
@@ -85,7 +102,8 @@ async function main() {
       created++
     }
 
-    await supabase.from("tm_rate_tiers").delete().eq("assignment_id", assignmentId)
+    const { error: deleteError } = await supabase.from("tm_rate_tiers").delete().eq("assignment_id", assignmentId)
+    if (deleteError) throw deleteError
     if (a.rate_tiers.length) {
       const { error } = await supabase.from("tm_rate_tiers").insert(a.rate_tiers.map((t) => ({ ...t, assignment_id: assignmentId })))
       if (error) throw error
