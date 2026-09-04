@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test"
 import { signIn, users } from "./helpers/auth"
-import { createPendingUser, deleteUserByEmail, deleteTutorByName, deleteStudentByName, findUserByEmail } from "./helpers/admin"
+import { createPendingUser, deleteUserByEmail, deleteTutorByName, deleteStudentByName, findUserByEmail, unlinkProfileByEmail } from "./helpers/admin"
 
 const stamp = Date.now().toString(36)
 
@@ -11,14 +11,17 @@ test.describe("tutor matching admin", () => {
     await page.goto("/tm/settings")
     const uen = page.getByLabel("PayNow UEN")
     const original = await uen.inputValue()
-    await uen.fill("202411710M-E2E")
-    await page.getByRole("button", { name: "Save settings" }).click()
-    await expect(page.getByText("Tutor Matching settings updated", { exact: true })).toBeVisible()
-    await page.reload()
-    await expect(page.getByLabel("PayNow UEN")).toHaveValue("202411710M-E2E")
-    await page.getByLabel("PayNow UEN").fill(original)
-    await page.getByRole("button", { name: "Save settings" }).click()
-    await expect(page.getByText("Tutor Matching settings updated", { exact: true })).toBeVisible()
+    try {
+      await uen.fill("202411710M-E2E")
+      await page.getByRole("button", { name: "Save settings" }).click()
+      await expect(page.getByText("Tutor Matching settings updated", { exact: true })).toBeVisible()
+      await page.reload()
+      await expect(page.getByLabel("PayNow UEN")).toHaveValue("202411710M-E2E")
+    } finally {
+      await page.getByLabel("PayNow UEN").fill(original)
+      await page.getByRole("button", { name: "Save settings" }).click()
+      await expect(page.getByText("Tutor Matching settings updated", { exact: true })).toBeVisible()
+    }
   })
 
   test("add a tutor", async ({ page }) => {
@@ -32,6 +35,28 @@ test.describe("tutor matching admin", () => {
       await expect(page.getByRole("cell", { name, exact: true })).toBeVisible()
       await expect(page.getByRole("row", { name: new RegExp(name) })).toContainText("Not linked")
     } finally {
+      await deleteTutorByName(name)
+    }
+  })
+
+  test("admin links their own account and sees the tutor portal entry", async ({ page }) => {
+    const name = `E2E Self ${stamp}`
+    await unlinkProfileByEmail(users.admin.email)
+    try {
+      await page.goto("/tm/tutors")
+      await page.getByRole("button", { name: "Add Tutor" }).click()
+      await page.getByLabel("Name *").fill(name)
+      await page.getByRole("button", { name: "Save" }).click()
+      const row = page.getByRole("row", { name: new RegExp(name) })
+      await row.getByRole("button", { name: "Link my account" }).click()
+      await page.getByRole("dialog").getByRole("button", { name: "Link", exact: true }).click()
+      await expect(page.getByText(`You are now linked to ${name}. The tutor portal is in the workspace menu.`, { exact: true })).toBeVisible()
+      await expect(page.getByRole("button", { name: "Link my account" })).toHaveCount(0)
+      await page.getByLabel("Switch workspace").click()
+      await expect(page.getByRole("menuitem", { name: "Tutor portal" })).toBeVisible()
+      await page.keyboard.press("Escape")
+    } finally {
+      await unlinkProfileByEmail(users.admin.email)
       await deleteTutorByName(name)
     }
   })

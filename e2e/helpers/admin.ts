@@ -36,6 +36,15 @@ export async function deleteTutorByName(name: string) {
   await adminClient().from("tm_tutors").delete().eq("name", name)
 }
 
+export async function unlinkTutorByName(name: string) {
+  await adminClient().from("tm_tutors").update({ profile_id: null }).eq("name", name)
+}
+
+export async function unlinkProfileByEmail(email: string) {
+  const user = await findUserByEmail(email)
+  if (user) await adminClient().from("tm_tutors").update({ profile_id: null }).eq("profile_id", user.id)
+}
+
 /** Deletes a student and its assignments (rate tiers cascade). */
 export async function deleteStudentByName(name: string) {
   const admin = adminClient()
