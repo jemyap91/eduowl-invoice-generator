@@ -3436,3 +3436,17 @@ Slices 2 to 5 each get their own plan, written after this one lands:
 3. Tutor portal: My Students, Log a Session, My Timesheet with `tm_submit_month`.
 4. Approvals: queue, entry editing with audit log, `tm_approve_submission`, send back.
 5. Invoices and dashboard: list, detail, WhatsApp text, Tutor Matching PDF, payment status, manual invoices, dashboard tiles.
+
+## Carry-forward from slice 1 execution
+
+Decisions and findings recorded during execution that later slices must honour:
+
+- **Slice 3, first task:** add `tm_timesheet_entries_tutor_view` (every column except `parent_rate`, filtered by `current_tutor_id()`, `REVOKE` from `anon`/`public`, `security_barrier`), with a `hasnt_column` pgTAP test, and read entries in the portal only through it. The `tm_snapshot_entry_rates` trigger (migration `20260904140000`) now writes the true parent rate onto every tutor-created entry, and `tutor_select_own_entries` is a row policy, so the base table must not be queried by tutor-facing code.
+- Tutor-facing inserts and updates on `tm_timesheet_entries` must send `rate_tier_id`; the trigger fills `tier_label`, `parent_rate`, `tutor_rate`. Sending rates from the client is ignored for non-admins.
+- `tm_set_entry_hours` only computes `hours` when it is NULL. A UI edit that changes start or end time must send `hours: null` to force recomputation.
+- The generated type for `current_tutor_id()` is non-nullable; it returns NULL for admins without a tutor row.
+- `tm_invoices.total_hours` is `NUMERIC(6,2)` by ruling (monthly aggregate); per-entry hours stay `NUMERIC(5,2)`.
+- Middleware and the OAuth callback treat a failed `profiles` lookup as `pending` (fail closed). Distinguishing a query error from a missing row is deferred polish.
+- The repo has no ESLint config, so `npm run lint` prompts interactively. Adding one is deferred.
+- Local Google sign-in is disabled in `supabase/config.toml` by default; e2e uses password-grant test users.
+- Before the production import, confirm against the source sheet that `x` in the checklist columns means unchecked (the parser treats it as false) and that no remark contains the word "collect" (which marks an assignment `stopped`).
