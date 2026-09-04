@@ -9,7 +9,7 @@
 
 Add a second workspace, **EduOwl Tutor Matching**, to the existing Pegasus Learning Academy app. It replaces a Google Sheet with an in-app pipeline: admin creates tutor/student assignments with rate tiers, tutors log sessions and submit a monthly timesheet, admin approves, an invoice is generated automatically, and payment status is tracked for both the parent and the tutor.
 
-The existing Academy screens are untouched in this round. They stay Pegasus-branded and get a workspace switcher in front of them.
+The existing Academy screens keep their features but are rebranded from Pegasus Learning Academy to **EduOwl English Academy**, and get a workspace switcher in front of them.
 
 ### Decisions made during brainstorming
 
@@ -18,7 +18,7 @@ The existing Academy screens are untouched in this round. They stay Pegasus-bran
 | Sign-in | Google OAuth via Supabase Auth, for admins and tutors. Email/password form and demo bypass removed. |
 | Admins | Two, seeded by email: `zijieynwa@gmail.com` and `ccchristabelle@gmail.com`. An admin can also be linked to a tutor profile and use the tutor portal. |
 | Tutor onboarding | Open signup. New Google accounts land as `pending`; admin approves from a pending list and links them to a tutor profile. |
-| Academy rebrand | Out of scope. Switcher plus new module only. |
+| Academy rebrand | In scope. Academy screens keep their features, lose all Pegasus branding, and take the EduOwl English Academy logo, palette, and invoice template. No feature changes to the Academy. |
 | Deposits | Informational: amount and collected status on the assignment. Never offsets an invoice. |
 | Tutor collects directly | Does not exist. Every invoice is agency-billed. No payment arrangement field. |
 | Relief tutors | Modelled as a separate assignment for the same student and subject, with its own rate tiers. No covering-tutor field. |
@@ -69,7 +69,7 @@ The existing middleware keeps its session check and adds one profile lookup:
 
 ### Workspace switcher (admin)
 
-- Dropdown at the top of the sidebar with two entries: **EduOwl English Academy** (existing routes, unchanged, still Pegasus-branded this round) and **Tutor Matching** (`/tm/*`). A third entry, **Tutor portal**, appears for admins linked to a tutor row.
+- Dropdown at the top of the sidebar with two entries: **EduOwl English Academy** (existing routes, rebranded, features unchanged) and **Tutor Matching** (`/tm/*`). A third entry, **Tutor portal**, appears for admins linked to a tutor row.
 - Selected workspace is stored in a cookie `workspace=academy|tm`. Landing on `/` with `workspace=tm` redirects to `/tm`.
 - Sidebar nav items are chosen by workspace. Tutor Matching items: Dashboard `/tm`, Pending Approvals `/tm/approvals`, Invoices `/tm/invoices`, Tutors `/tm/tutors`, Students & Assignments `/tm/students`, Master List `/tm/master-list`, Settings `/tm/settings`.
 - Header page titles extend to the new routes.
@@ -338,7 +338,26 @@ Every `tm_settings` column: company name, legal name, payment terms, PayNow UEN,
 
 ### Branding
 
-Tutor Matching uses the cartoon owl logo and the navy accent from the invoice template for its sidebar header, portal top bar, and PDF. The Academy workspace keeps the current Pegasus teal and logo until the separate rebrand. Both share the shadcn component set, so only the logo image and a CSS variable differ per workspace.
+Two brands share one component set. The workspace sets a `data-workspace` attribute on the layout root, and `globals.css` overrides the `--primary` and `--ring` tokens per workspace, so buttons, active nav, and badges recolour without touching components.
+
+| | EduOwl English Academy | Tutor Matching |
+|---|---|---|
+| Logo | Green owl wordmark with Chinese subtitle, `public/academy/logo.png`, extracted from `Yang Xin_July_eduowl.pdf` (image plus its alpha mask) | Cartoon owl, `public/tm/logo.png`, converted from `tutor_matching_logo.pdf` |
+| Primary | `#1FAB89`, HSL `165 69% 40%` | Navy `#2E3192`, HSL `239 52% 38%` |
+| Text | `#000000` on white | `#000000` on white |
+| Invoice header | "EduOwl" over "English Academy", green top bar | "EduOwl" over "Education Consultancy Pte. Ltd.", navy top bar |
+| Payment block | "By PAYNOW: 97205889" from the Academy payment methods table | Terms text, UEN, QR image |
+
+## 5a. Academy rebrand (Pegasus removal)
+
+Every Pegasus reference goes. Feature behaviour is unchanged.
+
+- **App shell:** `layout.tsx` title becomes "EduOwl". Sidebar and login page show `public/academy/logo.png`. `globals.css` default `--primary` becomes the EduOwl green. The Assistant font stays.
+- **Assets:** delete `public/pegasus_icon.png`, `public/pegasus_icon.webp`, `public/pegasus_qrcode.png`, `public/pegasus_qrcode.jpg`. Academy invoices no longer embed a QR code unless one is added to `public/academy/` later; the download button skips the QR when the file is absent.
+- **Academy invoice PDF:** `invoice-pdf.tsx` restyled to the `Yang Xin_July_eduowl.pdf` template: green top bar, "EduOwl / English Academy" header left, logo right, "Invoice for: {parent}", student name and month beneath, the same Description/Hours/Hourly Rate/Total price table, Payment Methods listing the configured payment methods, large total bottom right.
+- **Seed data:** the `academy_info` seed row becomes "EduOwl English Academy"; placeholders in the settings form updated. A migration updates the existing row too, for any project that already ran the first migration.
+- **Repo:** `package.json` name becomes `eduowl`, README retitled, `scripts/generate-user-guide.tsx` retitled and pointed at the new logo, Playwright smoke test asserts on "EduOwl". `docs/reference/pegasus_learning_academy_design.jpeg`, the Pegasus user guide PDF, and the Ms Selena sample invoice are deleted from the repo.
+- **Design doc:** the 2026-03 Pegasus design doc under `docs/plans` stays as history; its brand palette section is no longer authoritative, this document is.
 
 ## 6. Sheet import
 
@@ -367,7 +386,7 @@ Tutor Matching uses the cartoon owl logo and the navy accent from the invoice te
 
 ## 9. Build order
 
-1. **Foundation:** baseline commit, Google sign-in, profiles and roles, middleware, workspace switcher, all `tm_` migrations with RLS, import script.
+1. **Foundation:** baseline commit, Academy rebrand (Section 5a), Google sign-in, profiles and roles, middleware, workspace switcher, all `tm_` migrations with RLS, import script.
 2. **Admin data entry:** Tutors with pending signups, Students & Assignments, Settings, Master List.
 3. **Tutor portal:** My Students, Log a Session, My Timesheet with submit.
 4. **Approvals:** queue, entry editing with audit log, approve and send back, invoice generation.
@@ -392,4 +411,3 @@ Each slice is deployable on its own.
 - Payment gateway or bank reconciliation.
 - Deposit offsetting.
 - Tutor-visible payout status.
-- Academy rebrand to EduOwl (collateral is in `docs/reference` for when that happens).
