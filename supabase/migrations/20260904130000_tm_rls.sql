@@ -17,6 +17,7 @@ CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN
 LANGUAGE sql
 STABLE
+SET search_path = public
 AS $$
   SELECT public.app_role() = 'admin';
 $$;
@@ -29,6 +30,8 @@ CREATE VIEW tm_rate_tiers_tutor_view AS
   JOIN tm_assignments a ON a.id = rt.assignment_id
   WHERE a.tutor_id = public.current_tutor_id() OR public.is_admin();
 GRANT SELECT ON tm_rate_tiers_tutor_view TO authenticated;
+REVOKE ALL ON tm_rate_tiers_tutor_view FROM anon, public;
+ALTER VIEW tm_rate_tiers_tutor_view SET (security_barrier = true);
 
 -- ---------- Enable RLS ----------
 ALTER TABLE tm_tutors ENABLE ROW LEVEL SECURITY;
