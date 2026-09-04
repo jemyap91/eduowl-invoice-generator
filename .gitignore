@@ -9,3 +9,4 @@ supabase/.temp
 .superpowers
 playwright-report
 screenshots/*.png
+tmp

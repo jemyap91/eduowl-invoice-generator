@@ -94,7 +94,8 @@ export function DownloadInvoiceButton({
 
       const blob = await pdf(
         <InvoicePDF
-          academyName={academy?.name || 'EduOwl English Academy'}
+          academyName="EduOwl"
+          academySubtitle={academy?.name?.replace(/^EduOwl\s*/i, '') || 'English Academy'}
           academyAddress={academy?.address}
           academyPhone={academy?.phone}
           academyEmail={academy?.email}
