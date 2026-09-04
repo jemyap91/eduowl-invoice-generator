@@ -1098,6 +1098,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "tm_timesheet_entries_rate_tier_id_fkey"
+            columns: ["rate_tier_id"]
+            isOneToOne: false
+            referencedRelation: "tm_rate_tiers_tutor_view"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "tm_timesheet_entries_submission_id_fkey"
             columns: ["submission_id"]
             isOneToOne: false
@@ -1234,10 +1241,29 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      tm_rate_tiers_tutor_view: {
+        Row: {
+          assignment_id: string | null
+          id: string | null
+          label: string | null
+          sort_order: number | null
+          tutor_rate: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tm_rate_tiers_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "tm_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       app_role: { Args: never; Returns: string }
+      current_tutor_id: { Args: never; Returns: string }
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       attendance_status: "pending" | "attended" | "absent" | "cancelled"
