@@ -75,15 +75,15 @@ export default function LoginPage() {
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
             <Image
-              src="/pegasus_icon.webp"
-              alt="Pegasus Learning Academy"
-              width={80}
-              height={80}
-              className="rounded-lg"
+              src="/academy/logo.png"
+              alt="EduOwl"
+              width={200}
+              height={113}
+              priority
             />
           </div>
           <div>
-            <CardTitle className="text-xl">Pegasus Learning Academy</CardTitle>
+            <CardTitle className="text-xl">EduOwl</CardTitle>
             <CardDescription>Sign in to access the dashboard</CardDescription>
           </div>
         </CardHeader>

@@ -113,7 +113,7 @@ export function AcademyInfoSettings() {
             id="academy-name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Pegasus Learning Academy"
+            placeholder="e.g. EduOwl English Academy"
           />
         </div>
         <div className="space-y-2">
@@ -143,7 +143,7 @@ export function AcademyInfoSettings() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. info@pegasus.sg"
+              placeholder="e.g. hello@eduowl.sg"
             />
           </div>
         </div>

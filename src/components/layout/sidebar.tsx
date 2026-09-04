@@ -44,10 +44,10 @@ function SidebarContent({ onNavClick, collapsed }: { onNavClick?: () => void; co
       {/* Logo area */}
       <div className={cn("flex flex-col items-center gap-2 py-6", collapsed ? "px-2" : "px-4")}>
         <Image
-          src="/pegasus_icon.webp"
-          alt="Pegasus Learning Academy"
-          width={collapsed ? 40 : 120}
-          height={collapsed ? 40 : 120}
+          src="/academy/logo.png"
+          alt="EduOwl English Academy"
+          width={collapsed ? 44 : 200}
+          height={collapsed ? 25 : 113}
           priority
         />
       </div>
@@ -107,7 +107,7 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
     <TooltipProvider delayDuration={0}>
       <aside
         className={cn(
-          "hidden lg:flex h-screen flex-col border-r bg-gradient-to-b from-white to-[hsl(176,20%,98%)] transition-all duration-300 relative",
+          "hidden lg:flex h-screen flex-col border-r bg-gradient-to-b from-white to-[hsl(165,20%,98%)] transition-all duration-300 relative",
           collapsed ? "w-[64px]" : "w-[260px]"
         )}
         style={{ boxShadow: '2px 0 8px rgba(0,0,0,0.04)' }}
@@ -137,7 +137,7 @@ export function MobileSidebar({
 }) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="left" className="w-[260px] p-0 bg-gradient-to-b from-white to-[hsl(176,20%,98%)]">
+      <SheetContent side="left" className="w-[260px] p-0 bg-gradient-to-b from-white to-[hsl(165,20%,98%)]">
         <div className="flex h-full flex-col">
           <SidebarContent onNavClick={() => onOpenChange(false)} />
         </div>

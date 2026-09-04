@@ -3,8 +3,8 @@ import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Pegasus Learning Academy",
-  description: "Tuition agency management system",
+  title: "EduOwl",
+  description: "EduOwl English Academy and Tutor Matching management",
 };
 
 export default function RootLayout({

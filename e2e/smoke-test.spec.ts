@@ -8,10 +8,10 @@ test.describe('Navigation & Page Loading', () => {
     })
 
     await page.goto('/')
-    await expect(page).toHaveTitle(/Pegasus|Next/)
+    await expect(page).toHaveTitle(/EduOwl|Next/)
 
     // Check sidebar is visible on desktop
-    await expect(page.locator('text=PEGASUS')).toBeVisible()
+    await expect(page.getByAltText('EduOwl English Academy').first()).toBeVisible()
     await expect(page.locator('text=Dashboard')).toBeVisible()
 
     // Check dashboard content renders

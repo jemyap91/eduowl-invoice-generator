@@ -1,6 +1,6 @@
-# Pegasus Learning Academy
+# EduOwl
 
-A management platform for tuition centres to manage students, tutors, class schedules, attendance, and invoicing.
+Management platform for EduOwl English Academy (classroom scheduling, attendance, invoicing) and EduOwl Tutor Matching (home tutoring timesheets, approvals, invoicing).
 
 Built with Next.js, Supabase, Tailwind CSS, and shadcn/ui.
 

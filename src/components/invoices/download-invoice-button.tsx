@@ -90,19 +90,15 @@ export function DownloadInvoiceButton({
         })
       }
 
-      const [logoUrl, qrCodeUrl] = await Promise.all([
-        toDataUri('/pegasus_icon.png'),
-        toDataUri('/pegasus_qrcode.png'),
-      ])
+      const logoUrl = await toDataUri('/academy/logo.png')
 
       const blob = await pdf(
         <InvoicePDF
-          academyName={academy?.name || 'Pegasus Learning Academy'}
+          academyName={academy?.name || 'EduOwl English Academy'}
           academyAddress={academy?.address}
           academyPhone={academy?.phone}
           academyEmail={academy?.email}
           logoUrl={logoUrl}
-          qrCodeUrl={qrCodeUrl}
           invoiceRef={invoiceRef}
           invoiceDate={invoiceDate}
           dueDate={dueDate}

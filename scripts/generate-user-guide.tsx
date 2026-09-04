@@ -11,13 +11,13 @@ Font.register({
   ]
 })
 
-const TEAL = '#54ABA7'
+const TEAL = '#1FAB89'
 const TEXT = '#515151'
 const MUTED = '#626262'
 const BG_LIGHT = '#F7FAFA'
 
 const root = path.resolve(__dirname, '..')
-const logo = path.join(root, 'public', 'pegasus_icon.png')
+const logo = path.join(root, 'public', 'academy/logo.png')
 const shots = path.join(root, 'screenshots')
 
 const styles = StyleSheet.create({
@@ -164,7 +164,7 @@ function Tip({ text }: { text: string }) {
 }
 
 function Footer({ page }: { page: number }) {
-  return <Text style={styles.footer}>Pegasus Learning Academy — User Guide — Page {page}</Text>
+  return <Text style={styles.footer}>EduOwl English Academy — User Guide — Page {page}</Text>
 }
 
 function UserGuide() {
@@ -173,7 +173,7 @@ function UserGuide() {
       {/* Cover Page */}
       <Page size="A4" style={styles.coverPage}>
         <Image src={logo} style={styles.coverLogo} />
-        <Text style={styles.coverTitle}>PEGASUS LEARNING ACADEMY</Text>
+        <Text style={styles.coverTitle}>EDUOWL ENGLISH ACADEMY</Text>
         <Text style={styles.coverSubtitle}>Platform User Guide</Text>
         <Text style={styles.coverDate}>March 2026</Text>
       </Page>
@@ -283,7 +283,7 @@ function UserGuide() {
 }
 
 async function main() {
-  const outPath = path.join(root, 'Pegasus Learning Academy - User Guide.pdf')
+  const outPath = path.join(root, 'EduOwl English Academy - User Guide.pdf')
   console.log('Generating user guide PDF...')
   await renderToFile(<UserGuide />, outPath)
   console.log(`Done! Saved to: ${outPath}`)
