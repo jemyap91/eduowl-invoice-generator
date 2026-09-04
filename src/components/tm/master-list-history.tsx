@@ -135,7 +135,7 @@ export function MasterListHistory({ sources, invoices, onDownload }: Props) {
             <TableFooter>
               <TableRow>
                 <TableCell colSpan={5} className="font-semibold">Totals</TableCell>
-                <TableCell className="text-right font-semibold">{totals.hours}</TableCell>
+                <TableCell className="text-right font-semibold">{totals.hours.toFixed(2)}</TableCell>
                 <TableCell className="text-right font-semibold">{formatCurrency(totals.invoiceAmount)}</TableCell>
                 <TableCell className="text-right font-semibold">{formatCurrency(totals.tutorPay)}</TableCell>
                 <TableCell className="text-right font-semibold">{formatCurrency(totals.profit)}</TableCell>

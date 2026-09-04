@@ -22,6 +22,7 @@ export function SettingsForm() {
   const [paymentDetails, setPaymentDetails] = useState("")
   const [tiers, setTiers] = useState<RateTierDraft[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadFailed, setLoadFailed] = useState(false)
   const [saving, setSaving] = useState(false)
   const { toast } = useToast()
 
@@ -31,6 +32,7 @@ export function SettingsForm() {
       const { data, error } = await supabase.from("tm_settings").select("*").limit(1).maybeSingle()
       if (error || !data) {
         toast({ title: "Error", description: "Failed to load settings", variant: "destructive" })
+        setLoadFailed(true)
         setLoading(false)
         return
       }
@@ -78,6 +80,20 @@ export function SettingsForm() {
 
   if (loading) {
     return <Skeleton className="h-64 w-full" />
+  }
+
+  if (loadFailed) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Settings could not be loaded</CardTitle>
+          <CardDescription>Check your connection and try again.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button type="button" onClick={() => window.location.reload()}>Retry</Button>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (

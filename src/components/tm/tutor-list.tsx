@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
-  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -28,6 +28,7 @@ export function TutorList({ refreshKey = 0 }: { refreshKey?: number }) {
   const [editing, setEditing] = useState<TutorRow | null>(null)
   const [saving, setSaving] = useState(false)
   const [myProfileId, setMyProfileId] = useState<string | null>(null)
+  const [linkTarget, setLinkTarget] = useState<TutorRow | null>(null)
   const { toast } = useToast()
 
   const load = useCallback(async () => {
@@ -81,9 +82,24 @@ export function TutorList({ refreshKey = 0 }: { refreshKey?: number }) {
   async function linkMyAccount(tutor: TutorRow) {
     if (!myProfileId) return
     const supabase = createClient()
-    const { error } = await supabase.from("tm_tutors").update({ profile_id: myProfileId }).eq("id", tutor.id)
+    const { data, error } = await supabase
+      .from("tm_tutors")
+      .update({ profile_id: myProfileId })
+      .eq("id", tutor.id)
+      .is("profile_id", null)
+      .select("id")
+    setLinkTarget(null)
     if (error) {
       toast({ title: "Error", description: "Failed to link your account", variant: "destructive" })
+      return
+    }
+    if (!data || data.length === 0) {
+      toast({
+        title: "Already linked",
+        description: "That tutor already has a login. Reload to see the latest list.",
+        variant: "destructive",
+      })
+      load()
       return
     }
     toast({ title: "Linked", description: `You are now linked to ${tutor.name}. The tutor portal is in the workspace menu.` })
@@ -148,7 +164,7 @@ export function TutorList({ refreshKey = 0 }: { refreshKey?: number }) {
                       <div className="flex items-center gap-1">
                         <span className="text-muted-foreground">Not linked</span>
                         {!iAmLinked && myProfileId && (
-                          <Button variant="link" size="sm" className="px-2" onClick={() => linkMyAccount(t)}>
+                          <Button variant="link" size="sm" className="px-2" onClick={() => setLinkTarget(t)}>
                             Link my account
                           </Button>
                         )}
@@ -181,6 +197,21 @@ export function TutorList({ refreshKey = 0 }: { refreshKey?: number }) {
             defaultValues={editing ? { name: editing.name, phone: editing.phone || "", status: editing.status } : undefined}
             isLoading={saving}
           />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={linkTarget !== null} onOpenChange={(o) => { if (!o) setLinkTarget(null) }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Link my account</DialogTitle>
+            <DialogDescription>
+              You will be linked to {linkTarget?.name} and can open the tutor portal from the workspace menu.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setLinkTarget(null)}>Cancel</Button>
+            <Button onClick={() => { if (linkTarget) linkMyAccount(linkTarget) }}>Link</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

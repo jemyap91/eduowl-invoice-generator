@@ -11,7 +11,7 @@ export default function TutorMatchingDashboardPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
-          Assignments, tutors, and the master list are the next slice. Approvals, invoices, and this dashboard follow.
+          Manage tutors, students and assignments from the menu. Approvals, invoices and this dashboard arrive in the next slices.
         </CardContent>
       </Card>
     </div>
