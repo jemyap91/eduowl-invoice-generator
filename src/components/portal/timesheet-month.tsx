@@ -40,6 +40,7 @@ export function TimesheetMonth({ period, onPeriodChange }: Props) {
   const [deleting, setDeleting] = useState<PortalEntry | null>(null)
   const [submitting, setSubmitting] = useState<PortalAssignment | null>(null)
   const [busy, setBusy] = useState(false)
+  const [extraLabels, setExtraLabels] = useState<Map<string, string>>(new Map())
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -54,7 +55,7 @@ export function TimesheetMonth({ period, onPeriodChange }: Props) {
       setLoading(false)
       return
     }
-    setEntries((entriesRes.data ?? []).flatMap((r) => (r.id && r.assignment_id && r.date && r.status ? [{
+    const entriesRows: PortalEntry[] = (entriesRes.data ?? []).flatMap((r) => (r.id && r.assignment_id && r.date && r.status ? [{
       id: r.id,
       assignment_id: r.assignment_id,
       date: r.date,
@@ -67,10 +68,27 @@ export function TimesheetMonth({ period, onPeriodChange }: Props) {
       note: r.note,
       status: r.status as PortalEntry["status"],
       submission_id: r.submission_id,
-    }] : [])))
+    }] : []))
+    setEntries(entriesRows)
     setSubmissions(subsRes.data ?? [])
+    const known = new Set(ctx.assignments.map((a) => a.id))
+    const missing = Array.from(new Set(entriesRows.map((e) => e.assignment_id))).filter((id) => !known.has(id))
+    if (missing.length > 0) {
+      const { data: extra } = await supabase
+        .from("tm_assignments")
+        .select("id, subject, tm_students(name)")
+        .in("id", missing)
+      const labels = new Map<string, string>()
+      for (const row of extra ?? []) {
+        const student = (row.tm_students as { name: string } | null)?.name ?? ""
+        labels.set(row.id, `${student ? `${student} · ` : ""}${row.subject}`)
+      }
+      setExtraLabels(labels)
+    } else {
+      setExtraLabels(new Map())
+    }
     setLoading(false)
-  }, [period, toast])
+  }, [period, toast, ctx.assignments])
 
   useEffect(() => { load() }, [load])
 
@@ -158,7 +176,7 @@ export function TimesheetMonth({ period, onPeriodChange }: Props) {
         const totals = sumEntries(list)
         const submitCheck = canSubmit(list, state)
         const editable = isEditable(state)
-        const title = a ? `${a.studentName} · ${a.subject}` : list[0]?.tier_label ? "Assignment" : "Assignment"
+        const title = a ? `${a.studentName} · ${a.subject}` : extraLabels.get(id) ?? "Assignment"
         return (
           <Card key={id}>
             <CardHeader className="pb-2">
