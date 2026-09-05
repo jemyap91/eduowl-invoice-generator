@@ -1610,7 +1610,7 @@ test.describe.serial("tutor portal", () => {
     await expect(page.getByText("1.50 hours")).toBeVisible()
     await page.getByLabel("Note").fill("E2E session")
     await page.getByRole("button", { name: "Save session" }).click()
-    await expect(page.getByText("Session logged", { exact: true })).toBeVisible()
+    await expect(page.getByText("Session logged", { exact: true }).first()).toBeVisible()
     await expect(page).toHaveURL(/\/portal\/timesheet\?month=\d{4}-\d{2}/)
     const row = page.getByRole("row", { name: /E2E session/ })
     await expect(row).toContainText("1.50")
@@ -1625,7 +1625,7 @@ test.describe.serial("tutor portal", () => {
     await page.getByLabel("End time").fill("")
     await page.getByLabel("Or hours").fill("2")
     await page.getByRole("button", { name: "Save changes" }).click()
-    await expect(page.getByText("Session updated", { exact: true })).toBeVisible()
+    await expect(page.getByText("Session updated", { exact: true }).first()).toBeVisible()
     await expect(page.getByRole("row", { name: /E2E session/ })).toContainText("2.00")
   })
 
@@ -1633,13 +1633,13 @@ test.describe.serial("tutor portal", () => {
     await page.goto("/portal/timesheet")
     await page.getByRole("button", { name: "Submit for approval" }).click()
     await page.getByRole("dialog").getByRole("button", { name: "Submit", exact: true }).click()
-    await expect(page.getByText("Submitted, waiting for approval")).toBeVisible()
+    await expect(page.getByText("Submitted, waiting for approval").first()).toBeVisible()
     await expect(page.getByRole("button", { name: /^Edit session on / })).toHaveCount(0)
 
     await page.goto("/portal/log")
     await page.getByLabel("Or hours").fill("1")
     await page.getByRole("button", { name: "Save session" }).click()
-    await expect(page.getByText("This month has already been submitted for approval")).toBeVisible()
+    await expect(page.getByText("This month has already been submitted for approval").first()).toBeVisible()
   })
 })
 ```
