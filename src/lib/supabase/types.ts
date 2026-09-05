@@ -785,6 +785,13 @@ export type Database = {
             referencedRelation: "tm_timesheet_entries"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "tm_entry_edits_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "tm_timesheet_entries_tutor_view"
+            referencedColumns: ["id"]
+          },
         ]
       }
       tm_invoices: {
@@ -1259,6 +1266,106 @@ export type Database = {
           },
         ]
       }
+      tm_timesheet_entries_tutor_view: {
+        Row: {
+          assignment_id: string | null
+          created_at: string | null
+          date: string | null
+          end_time: string | null
+          hours: number | null
+          id: string | null
+          invoice_id: string | null
+          note: string | null
+          rate_tier_id: string | null
+          start_time: string | null
+          status: string | null
+          submission_id: string | null
+          tier_label: string | null
+          tutor_id: string | null
+          tutor_rate: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          assignment_id?: string | null
+          created_at?: string | null
+          date?: string | null
+          end_time?: string | null
+          hours?: number | null
+          id?: string | null
+          invoice_id?: string | null
+          note?: string | null
+          rate_tier_id?: string | null
+          start_time?: string | null
+          status?: string | null
+          submission_id?: string | null
+          tier_label?: string | null
+          tutor_id?: string | null
+          tutor_rate?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          assignment_id?: string | null
+          created_at?: string | null
+          date?: string | null
+          end_time?: string | null
+          hours?: number | null
+          id?: string | null
+          invoice_id?: string | null
+          note?: string | null
+          rate_tier_id?: string | null
+          start_time?: string | null
+          status?: string | null
+          submission_id?: string | null
+          tier_label?: string | null
+          tutor_id?: string | null
+          tutor_rate?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tm_timesheet_entries_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "tm_assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tm_timesheet_entries_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "tm_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tm_timesheet_entries_rate_tier_id_fkey"
+            columns: ["rate_tier_id"]
+            isOneToOne: false
+            referencedRelation: "tm_rate_tiers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tm_timesheet_entries_rate_tier_id_fkey"
+            columns: ["rate_tier_id"]
+            isOneToOne: false
+            referencedRelation: "tm_rate_tiers_tutor_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tm_timesheet_entries_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "tm_submissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tm_timesheet_entries_tutor_id_fkey"
+            columns: ["tutor_id"]
+            isOneToOne: false
+            referencedRelation: "tm_tutors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       app_role: { Args: never; Returns: string }
@@ -1275,6 +1382,10 @@ export type Database = {
       }
       tm_save_assignment: {
         Args: { p_assignment: Json; p_id?: string; p_tiers: Json }
+        Returns: string
+      }
+      tm_submit_month: {
+        Args: { p_assignment_id: string; p_month: number; p_year: number }
         Returns: string
       }
     }
