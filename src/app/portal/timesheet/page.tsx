@@ -1,13 +1,27 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+"use client"
+
+import { Suspense, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { TimesheetMonth } from "@/components/portal/timesheet-month"
+import { currentPeriod, parseMonthInput, toMonthInput, type Period } from "@/lib/tm/periods"
+
+function Timesheet() {
+  const params = useSearchParams()
+  const router = useRouter()
+  const [period, setPeriod] = useState<Period>(() => parseMonthInput(params.get("month") ?? "") ?? currentPeriod())
+
+  function change(p: Period) {
+    setPeriod(p)
+    router.replace(`/portal/timesheet?month=${toMonthInput(p)}`)
+  }
+
+  return <TimesheetMonth period={period} onPeriodChange={change} />
+}
 
 export default function MyTimesheetPage() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>My Timesheet</CardTitle>
-        <CardDescription>Review and submit this month&apos;s sessions.</CardDescription>
-      </CardHeader>
-      <CardContent className="text-sm text-muted-foreground">Nothing to show yet.</CardContent>
-    </Card>
+    <Suspense>
+      <Timesheet />
+    </Suspense>
   )
 }
