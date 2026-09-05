@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server"
 import { createServerClient, type CookieOptions } from "@supabase/ssr"
 import { homeFor, type Role } from "@/lib/auth/routing"
 import { WORKSPACE_COOKIE, isWorkspace } from "@/lib/workspace"
+import type { Database } from "@/lib/supabase/types"
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
@@ -10,7 +11,7 @@ export async function GET(request: NextRequest) {
 
   const pendingCookies: { name: string; value: string; options: CookieOptions }[] = []
 
-  const supabase = createServerClient(
+  const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {

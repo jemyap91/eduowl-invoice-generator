@@ -28,7 +28,7 @@ import { Plus, Pencil, Trash2, DoorOpen } from "lucide-react"
 interface Classroom {
   id: string
   name: string
-  capacity: number
+  capacity: number | null
 }
 
 export function ClassroomsSettings() {

@@ -5,7 +5,7 @@
 --   post_trial_checkin_done, monthly_est_profit, additional_materials, remarks).
 -- p_tiers: jsonb array of {label, parent_rate, tutor_rate, sort_order}; must be non-empty.
 -- Tiers are upserted on (assignment_id, label) so unchanged labels keep their ids; labels not in p_tiers are deleted.
-CREATE OR REPLACE FUNCTION public.tm_save_assignment(p_id UUID, p_assignment JSONB, p_tiers JSONB)
+CREATE OR REPLACE FUNCTION public.tm_save_assignment(p_assignment JSONB, p_tiers JSONB, p_id UUID DEFAULT NULL)
 RETURNS UUID
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -79,5 +79,5 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION public.tm_save_assignment(UUID, JSONB, JSONB) FROM public, anon;
-GRANT EXECUTE ON FUNCTION public.tm_save_assignment(UUID, JSONB, JSONB) TO authenticated;
+REVOKE ALL ON FUNCTION public.tm_save_assignment(JSONB, JSONB, UUID) FROM public, anon;
+GRANT EXECUTE ON FUNCTION public.tm_save_assignment(JSONB, JSONB, UUID) TO authenticated;

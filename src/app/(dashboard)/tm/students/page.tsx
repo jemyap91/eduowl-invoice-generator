@@ -70,9 +70,9 @@ export default function TmStudentsPage() {
     }
 
     const { data, error } = await supabase.rpc("tm_save_assignment", {
-      p_id: target.assignment?.id ?? null,
       p_assignment: payload,
       p_tiers: values.tiers,
+      p_id: target.assignment?.id,
     })
     setSaving(false)
     if (error) {

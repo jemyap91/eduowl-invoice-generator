@@ -3,6 +3,7 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { resolveRedirect, type Role } from "@/lib/auth/routing"
 import { WORKSPACE_COOKIE, isWorkspace } from "@/lib/workspace"
+import type { Database } from "@/lib/supabase/types"
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -11,7 +12,7 @@ export async function middleware(request: NextRequest) {
     request,
   })
 
-  const supabase = createServerClient(
+  const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {

@@ -66,7 +66,7 @@ export function DownloadInvoiceButton({
       const academy = academyRes.data
       const invoice = invoiceRes.data
 
-      const subtotal = items.reduce((sum, item) => sum + parseFloat(item.total), 0)
+      const subtotal = items.reduce((sum, item) => sum + parseFloat(item.total as unknown as string), 0)
 
       const invoiceRef = invoice?.invoice_number || `INV-${invoiceId.slice(0, 8).toUpperCase()}`
       const now = new Date()
@@ -111,10 +111,10 @@ export function DownloadInvoiceButton({
           year={year}
           items={items.map(item => ({
             description: item.description,
-            hours: item.hours ? parseFloat(item.hours) : null,
-            hourlyRate: item.hourly_rate ? parseFloat(item.hourly_rate) : null,
-            total: parseFloat(item.total),
-            isAdhoc: item.is_adhoc,
+            hours: item.hours ? parseFloat(item.hours as unknown as string) : null,
+            hourlyRate: item.hourly_rate ? parseFloat(item.hourly_rate as unknown as string) : null,
+            total: parseFloat(item.total as unknown as string),
+            isAdhoc: item.is_adhoc ?? false,
             datesAttended: item.dates_attended || undefined,
           }))}
           subtotal={subtotal}

@@ -29,7 +29,7 @@ interface PaymentMethod {
   id: string
   name: string
   details: string | null
-  display_order: number
+  display_order: number | null
 }
 
 export function PaymentMethodsSettings() {
@@ -93,7 +93,7 @@ export function PaymentMethodsSettings() {
 
     const payload = {
       name: name.trim(),
-      details: details.trim() || null,
+      details: (details.trim() || null) as string,
       display_order: parseInt(displayOrder, 10),
     }
 

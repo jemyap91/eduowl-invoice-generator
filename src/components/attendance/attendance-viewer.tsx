@@ -31,6 +31,8 @@ interface Student {
   stream_name: string | null
 }
 
+type AttendanceStatus = "pending" | "attended" | "absent" | "cancelled"
+
 interface SessionRecord {
   id: string
   session_id: string
@@ -198,7 +200,7 @@ export function AttendanceViewer() {
 
       const map: Record<string, string> = {}
       for (const m of makeups || []) {
-        map[m.makeup_for_session_id] = m.date
+        if (m.makeup_for_session_id) map[m.makeup_for_session_id] = m.date
       }
       setMakeupMap(map)
     } else {
@@ -251,7 +253,7 @@ export function AttendanceViewer() {
     return { total, attended, absent }
   }, [filteredSessions])
 
-  async function updateAttendanceStatus(recordId: string, newStatus: string) {
+  async function updateAttendanceStatus(recordId: string, newStatus: AttendanceStatus) {
     const supabase = createClient()
     const { error } = await supabase
       .from("session_students")
@@ -272,7 +274,7 @@ export function AttendanceViewer() {
     toast({ title: "Updated", description: "Attendance status updated" })
   }
 
-  async function bulkUpdateStatus(newStatus: string) {
+  async function bulkUpdateStatus(newStatus: AttendanceStatus) {
     const ids = Array.from(selectedIds)
     if (ids.length === 0) {
       toast({ title: "No selection", description: "Select sessions first using the checkboxes", variant: "destructive" })
@@ -475,7 +477,7 @@ export function AttendanceViewer() {
                         <TableCell>
                           <Select
                             value={record.attendance_status}
-                            onValueChange={(value) => updateAttendanceStatus(record.id, value)}
+                            onValueChange={(value) => updateAttendanceStatus(record.id, value as AttendanceStatus)}
                           >
                             <SelectTrigger className={`h-7 w-[120px] text-xs border-0 ${style.bg} ${style.text} font-medium`}>
                               <SelectValue />

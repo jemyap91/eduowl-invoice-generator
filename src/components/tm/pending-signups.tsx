@@ -68,7 +68,7 @@ export function PendingSignups({ onChanged }: { onChanged: () => void }) {
     const { error } = await supabase.rpc("tm_approve_signup", {
       p_profile_id: mode.profile.id,
       p_name: name.trim(),
-      p_phone: phone.trim() || null,
+      p_phone: phone.trim() || undefined,
     })
     setBusy(false)
     if (error) {

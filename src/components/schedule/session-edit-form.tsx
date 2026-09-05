@@ -173,7 +173,7 @@ export function SessionEditForm({ open, onOpenChange, session, onSaved }: Sessio
       const studentPayloads = toAdd.map((studentId) => ({
         session_id: session.id,
         student_id: studentId,
-        attendance_status: "pending",
+        attendance_status: "pending" as const,
       }))
 
       const { error: addError } = await supabase

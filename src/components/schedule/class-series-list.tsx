@@ -123,7 +123,7 @@ export function ClassSeriesList() {
 
       if (sessions) {
         for (const session of sessions) {
-          sessionCounts[session.series_id] = (sessionCounts[session.series_id] || 0) + 1
+          if (session.series_id) sessionCounts[session.series_id] = (sessionCounts[session.series_id] || 0) + 1
         }
       }
 
@@ -139,7 +139,7 @@ export function ClassSeriesList() {
           // Map session_id to series_id, then count unique students per series
           const sessionToSeries: Record<string, string> = {}
           for (const session of sessions || []) {
-            sessionToSeries[session.id] = session.series_id
+            if (session.series_id) sessionToSeries[session.id] = session.series_id
           }
 
           const seriesStudents: Record<string, Map<string, string>> = {}
@@ -243,10 +243,10 @@ export function ClassSeriesList() {
 
       setExpandedStudents(enrolledNames)
       setExpandedSessions(
-        sessions.map((s: { id: string; date: string; status: string }) => ({
+        sessions.map((s) => ({
           id: s.id,
           date: s.date,
-          status: s.status,
+          status: s.status ?? "scheduled",
           student_count: studentCountMap[s.id] || 0,
           makeup_date: makeupDateMap[s.id] || null,
           cancelled_students: cancelledStudentsMap[s.id] || [],
@@ -413,7 +413,7 @@ export function ClassSeriesList() {
         values.student_ids.map((studentId) => ({
           session_id: session.id,
           student_id: studentId,
-          attendance_status: "pending",
+          attendance_status: "pending" as const,
         }))
       )
 
@@ -548,7 +548,7 @@ export function ClassSeriesList() {
             values.student_ids.map((studentId) => ({
               session_id: session.id,
               student_id: studentId,
-              attendance_status: "pending",
+              attendance_status: "pending" as const,
             }))
           )
           const batchSize = 500
@@ -575,7 +575,7 @@ export function ClassSeriesList() {
             values.student_ids.map((studentId) => ({
               session_id: session.id,
               student_id: studentId,
-              attendance_status: "pending",
+              attendance_status: "pending" as const,
             }))
           )
           const batchSize = 500

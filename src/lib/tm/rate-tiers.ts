@@ -8,7 +8,7 @@ export interface RateTierDraft {
   tutor_rate: string
 }
 
-export interface RateTierValue {
+export type RateTierValue = {
   label: string
   parent_rate: number
   tutor_rate: number

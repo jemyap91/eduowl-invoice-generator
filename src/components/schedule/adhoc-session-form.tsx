@@ -183,7 +183,7 @@ export function AdhocSessionForm({ open, onOpenChange, onCreated, makeupForSessi
       const studentPayloads = selectedStudentIds.map((studentId) => ({
         session_id: session.id,
         student_id: studentId,
-        attendance_status: "pending",
+        attendance_status: "pending" as const,
       }))
 
       const { error: studentsError } = await supabase
