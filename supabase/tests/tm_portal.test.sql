@@ -1,6 +1,6 @@
 BEGIN;
 CREATE EXTENSION IF NOT EXISTS pgtap WITH SCHEMA extensions;
-SELECT plan(19);
+SELECT plan(21);
 
 -- Users: tutor A, tutor B, admin
 INSERT INTO auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
@@ -80,6 +80,12 @@ SELECT is((SELECT hours FROM tm_timesheet_entries_tutor_view WHERE id = 'f100000
 SELECT lives_ok($$ SELECT tm_submit_month('d1000000-0000-0000-0000-000000000001', EXTRACT(YEAR FROM current_date)::int, EXTRACT(MONTH FROM current_date)::int) $$, 'resubmission creates a new submission');
 SELECT is((SELECT count(*)::int FROM tm_submissions WHERE assignment_id = 'd1000000-0000-0000-0000-000000000001'), 2, 'returned submission kept as history');
 SELECT is((SELECT count(*)::int FROM tm_timesheet_entries_tutor_view WHERE assignment_id = 'd1000000-0000-0000-0000-000000000001' AND status = 'submitted'), 2, 'entries re-locked under the new submission');
+
+-- ---- Admin sees every entry and can submit on a tutor's behalf ----
+SET LOCAL role authenticated;
+SET LOCAL request.jwt.claims = '{"sub":"a1000000-0000-0000-0000-000000000009","role":"authenticated"}';
+SELECT is((SELECT count(*)::int FROM tm_timesheet_entries_tutor_view), 4, 'admin sees both tutors'' entries through the view');
+SELECT lives_ok($$ SELECT tm_submit_month('d1000000-0000-0000-0000-000000000002', EXTRACT(YEAR FROM current_date)::int, EXTRACT(MONTH FROM current_date)::int) $$, 'admin submits another tutor''s month');
 
 -- ---- Anon sees nothing ----
 SET LOCAL role anon;
