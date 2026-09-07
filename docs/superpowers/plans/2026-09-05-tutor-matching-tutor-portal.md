@@ -1532,7 +1532,7 @@ Claude-Session: https://claude.ai/code/session_01Nz2dMwYkjrRRcXcuVwSWs1"
 - Consumes: `signIn`, `users` (`e2e/helpers/auth.ts`); `adminClient()`, `deleteStudentByName` (`e2e/helpers/admin.ts`). The seeded tutor user `tutor.e2e@example.com` is linked to the `tm_tutors` row named "E2E Tutor".
 - Produces: `createAssignmentForTutor(tutorName, studentName, code)` and `deleteAssignmentData(studentName)` fixture helpers.
 
-- [ ] **Step 1: Fixture helpers**
+- [x] **Step 1: Fixture helpers**
 
 Append to `e2e/helpers/admin.ts`:
 
@@ -1570,7 +1570,7 @@ export async function deleteAssignmentData(studentName: string) {
 }
 ```
 
-- [ ] **Step 2: The spec**
+- [x] **Step 2: The spec**
 
 Create `e2e/tutor-portal.spec.ts`:
 
@@ -1646,7 +1646,7 @@ test.describe.serial("tutor portal", () => {
 
 If the `Student` select has more than one assignment for the seeded tutor (a previous failed run left one behind), the log test still works because the link from My Students preselects the assignment; the second "Save session" in the last test relies on the single-assignment auto-select, so clean leftovers with `deleteAssignmentData` for stale names if it fails on "Choose a student.".
 
-- [ ] **Step 3: Run the spec**
+- [x] **Step 3: Run the spec**
 
 ```bash
 npx playwright test e2e/tutor-portal.spec.ts --reporter=list
@@ -1654,7 +1654,7 @@ npx playwright test e2e/tutor-portal.spec.ts --reporter=list
 
 Expected: 4 passed. Selector mismatches may be fixed in the spec and noted; behaviour mismatches are bugs to report.
 
-- [ ] **Step 4: Full verification**
+- [x] **Step 4: Full verification**
 
 ```bash
 npx tsc --noEmit && npm test && npm run build
@@ -1665,7 +1665,7 @@ npm run seed:test-users && npm run import:master-list
 
 Expected: unit tests green (15 files), build lists the three portal routes, 46 e2e passed, pgTAP 6 files / 92 assertions.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add -A

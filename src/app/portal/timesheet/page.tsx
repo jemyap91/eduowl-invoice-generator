@@ -20,8 +20,11 @@ function Timesheet() {
 
 export default function MyTimesheetPage() {
   return (
-    <Suspense>
-      <Timesheet />
-    </Suspense>
+    <div className="space-y-4">
+      <h1 className="text-lg font-semibold">My Timesheet</h1>
+      <Suspense>
+        <Timesheet />
+      </Suspense>
+    </div>
   )
 }

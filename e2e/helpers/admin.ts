@@ -54,3 +54,35 @@ export async function deleteStudentByName(name: string) {
     await admin.from("tm_students").delete().eq("id", s.id)
   }
 }
+
+/** Creates a student, an active assignment for the named tutor, and one "1 to 1" tier (parent 70 / tutor 50). */
+export async function createAssignmentForTutor(tutorName: string, studentName: string, code: string) {
+  const admin = adminClient()
+  const { data: tutor, error: tErr } = await admin.from("tm_tutors").select("id").eq("name", tutorName).maybeSingle()
+  if (tErr || !tutor) throw new Error(`tutor ${tutorName} not found: ${tErr?.message ?? "no row"}`)
+  const { data: student, error: sErr } = await admin.from("tm_students").insert({ name: studentName, parent_name: "E2E Parent" }).select("id").single()
+  if (sErr) throw sErr
+  const { data: assignment, error: aErr } = await admin
+    .from("tm_assignments")
+    .insert({ code, tutor_id: tutor.id, student_id: student.id, subject: "E2E Subject", status: "active" })
+    .select("id").single()
+  if (aErr) throw aErr
+  const { error: rErr } = await admin.from("tm_rate_tiers").insert({ assignment_id: assignment.id, label: "1 to 1", parent_rate: 70, tutor_rate: 50, sort_order: 0 })
+  if (rErr) throw rErr
+  return { tutorId: tutor.id, studentId: student.id, assignmentId: assignment.id }
+}
+
+/** Removes submissions, entries, assignments, and the student created by createAssignmentForTutor. */
+export async function deleteAssignmentData(studentName: string) {
+  const admin = adminClient()
+  const { data: students } = await admin.from("tm_students").select("id").eq("name", studentName)
+  for (const s of students ?? []) {
+    const { data: assignments } = await admin.from("tm_assignments").select("id").eq("student_id", s.id)
+    for (const a of assignments ?? []) {
+      await admin.from("tm_timesheet_entries").delete().eq("assignment_id", a.id)
+      await admin.from("tm_submissions").delete().eq("assignment_id", a.id)
+      await admin.from("tm_assignments").delete().eq("id", a.id)
+    }
+    await admin.from("tm_students").delete().eq("id", s.id)
+  }
+}
