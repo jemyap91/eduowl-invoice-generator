@@ -54,7 +54,7 @@
 **Interfaces:**
 - Produces: every `createClient()` returns `SupabaseClient<Database>`; `supabase.rpc("tm_save_assignment", { p_assignment, p_tiers, p_id? })` with `p_id` optional. Later tasks rely on typed rows for `tm_timesheet_entries_tutor_view`, `tm_rate_tiers_tutor_view`, `tm_submissions`, and the `tm_submit_month` RPC (all regenerated in Task 2).
 
-- [ ] **Step 1: Make `p_id` optional in the SQL function**
+- [x] **Step 1: Make `p_id` optional in the SQL function**
 
 In `supabase/migrations/20260905110000_tm_save_assignment.sql`, change the signature so the optional parameter comes last:
 
@@ -66,7 +66,7 @@ and update the two grant lines to `public.tm_save_assignment(JSONB, JSONB, UUID)
 
 Run `npx supabase db reset && npm run db:test`; expected: all files pass (74 assertions). Then `npm run db:types` and confirm `src/lib/supabase/types.ts` now shows `tm_save_assignment: { Args: { p_assignment: Json; p_id?: string; p_tiers: Json } ...`.
 
-- [ ] **Step 2: Apply the generic**
+- [x] **Step 2: Apply the generic**
 
 `src/lib/supabase/client.ts`:
 
@@ -84,7 +84,7 @@ export function createClient() {
 
 `src/lib/supabase/server.ts`: add `import type { Database } from './types'` and change `createServerClient(` to `createServerClient<Database>(`. Do the same in `src/middleware.ts` and `src/app/auth/callback/route.ts` (both call `createServerClient` directly; import the type from `@/lib/supabase/types`).
 
-- [ ] **Step 3: Fix what the compiler reports**
+- [x] **Step 3: Fix what the compiler reports**
 
 Run `npx tsc --noEmit`. Fix each error with the narrowest change that keeps runtime behaviour identical. Expected categories:
 
@@ -95,7 +95,7 @@ Run `npx tsc --noEmit`. Fix each error with the narrowest change that keeps runt
 
 Do not add `// @ts-expect-error`. If an error cannot be resolved without changing behaviour, stop and report NEEDS_CONTEXT with the error text.
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 ```bash
 npx tsc --noEmit && npm test && npm run build
@@ -104,7 +104,7 @@ npx playwright test e2e/tm-admin.spec.ts --reporter=list
 
 Expected: clean, 89 unit tests, build ok, 6 e2e passed (the assignment save still works through the reordered RPC).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add -A
@@ -125,7 +125,7 @@ Claude-Session: https://claude.ai/code/session_01Nz2dMwYkjrRRcXcuVwSWs1"
 **Interfaces:**
 - Produces: view `tm_timesheet_entries_tutor_view` (every `tm_timesheet_entries` column except `parent_rate`, filtered to the caller's tutor or admin); trigger `tm_guard_locked_month`; function `tm_submit_month(p_assignment_id uuid, p_year int, p_month int) returns uuid`. Tasks 4 to 6 read entries only via the view and submit only via the function.
 
-- [ ] **Step 1: Failing pgTAP test**
+- [x] **Step 1: Failing pgTAP test**
 
 Create `supabase/tests/tm_portal.test.sql`:
 
@@ -224,7 +224,7 @@ ROLLBACK;
 
 Run `npx supabase db reset && npm run db:test`; expected: `tm_portal.test.sql` fails at `has_view`.
 
-- [ ] **Step 2: The migration**
+- [x] **Step 2: The migration**
 
 Create `supabase/migrations/20260905120000_tm_portal.sql`:
 
@@ -356,7 +356,7 @@ REVOKE ALL ON FUNCTION public.tm_submit_month(UUID, INT, INT) FROM public, anon;
 GRANT EXECUTE ON FUNCTION public.tm_submit_month(UUID, INT, INT) TO authenticated;
 ```
 
-- [ ] **Step 3: Run the tests, regenerate types**
+- [x] **Step 3: Run the tests, regenerate types**
 
 ```bash
 npx supabase db reset && npm run db:test
@@ -368,7 +368,7 @@ Expected: six files pass (92 assertions); `types.ts` gains `tm_timesheet_entries
 
 If the `throws_ok` for the locked-month insert reports SQLSTATE `23502` instead of `22023`, the snapshot trigger fired before the guard (triggers fire in name order: `tm_guard_locked_month` < `tm_snapshot_entry_rates` < `tm_set_entry_hours`, so the guard should be first). Check the trigger names before changing anything.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add supabase/migrations/20260905120000_tm_portal.sql supabase/tests/tm_portal.test.sql src/lib/supabase/types.ts
@@ -395,7 +395,7 @@ Claude-Session: https://claude.ai/code/session_01Nz2dMwYkjrRRcXcuVwSWs1"
   - `validateSession(input: SessionInput, today: string): { ok: true; payload: SessionPayload } | { ok: false; error: string }`
   - `PortalEntry`, `entryPayout(e)`, `groupByAssignment(entries)`, `sumEntries(entries)`, `SubmissionState`, `submissionState(sub)`, `isEditable(state)`, `canSubmit(entries, state)`, `formatHours(h)`
 
-- [ ] **Step 1: Failing session tests**
+- [x] **Step 1: Failing session tests**
 
 Create `src/lib/portal/sessions.test.ts`:
 
@@ -466,7 +466,7 @@ describe("validateSession", () => {
 })
 ```
 
-- [ ] **Step 2: Sessions implementation**
+- [x] **Step 2: Sessions implementation**
 
 Create `src/lib/portal/sessions.ts`:
 
@@ -553,7 +553,7 @@ export function validateSession(input: SessionInput, today: string): SessionVali
 
 Run `npx vitest run src/lib/portal/sessions.test.ts`; expected: pass.
 
-- [ ] **Step 3: Failing timesheet tests**
+- [x] **Step 3: Failing timesheet tests**
 
 Create `src/lib/portal/timesheet.test.ts`:
 
@@ -624,7 +624,7 @@ describe("formatHours", () => {
 })
 ```
 
-- [ ] **Step 4: Timesheet implementation**
+- [x] **Step 4: Timesheet implementation**
 
 Create `src/lib/portal/timesheet.ts`:
 
@@ -705,7 +705,7 @@ export function formatHours(h: number): string {
 
 Run `npm test`; expected: all pass (15 files).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/portal
@@ -731,7 +731,7 @@ Claude-Session: https://claude.ai/code/session_01Nz2dMwYkjrRRcXcuVwSWs1"
   - `usePortalContext(): { loading: boolean; error: string | null; tutor: { id: string; name: string } | null; assignments: PortalAssignment[]; reload: () => void }`
   Tasks 5 and 6 consume the hook.
 
-- [ ] **Step 1: The hook**
+- [x] **Step 1: The hook**
 
 Create `src/components/portal/use-portal-context.ts`:
 
@@ -847,7 +847,7 @@ export function usePortalContext(): PortalContext {
 
 View columns are nullable in the generated types (Postgres cannot prove view columns non-null), which is why the loop guards `t.id`, `t.assignment_id`, `t.label`. If `tsc` reports that `r.tm_students` is typed as an array, use `Array.isArray(r.tm_students) ? r.tm_students[0]?.name : r.tm_students?.name`.
 
-- [ ] **Step 2: Cards and page**
+- [x] **Step 2: Cards and page**
 
 Create `src/components/portal/assignment-cards.tsx`:
 
@@ -915,7 +915,7 @@ export default function MyStudentsPage() {
 }
 ```
 
-- [ ] **Step 3: Verify and commit**
+- [x] **Step 3: Verify and commit**
 
 `npx tsc --noEmit && npm run build`. Then `npx playwright test e2e/auth-routing.spec.ts --reporter=list` still passes (the tutor test asserts the portal loads and the "E2E Tutor" name in the header; the seeded tutor has no assignments so the empty-state card shows).
 
@@ -939,7 +939,7 @@ Claude-Session: https://claude.ai/code/session_01Nz2dMwYkjrRRcXcuVwSWs1"
 - Consumes: `usePortalContext`, `PortalAssignment` (Task 4); `validateSession`, `todayIso`, `SessionInput`, `SessionPayload` (Task 3).
 - Produces: `<SessionForm assignments defaultAssignmentId initial lockAssignment onSubmit onCancel submitLabel isLoading />` where `initial?: Partial<SessionInput>` and `onSubmit(payload: SessionPayload): Promise<void>`. Task 6 reuses it for edits.
 
-- [ ] **Step 1: The form**
+- [x] **Step 1: The form**
 
 Create `src/components/portal/session-form.tsx`:
 
@@ -1064,7 +1064,7 @@ export function SessionForm({
 }
 ```
 
-- [ ] **Step 2: Log a Session page**
+- [x] **Step 2: Log a Session page**
 
 Replace `src/app/portal/log/page.tsx` with:
 
@@ -1146,7 +1146,7 @@ export default function LogSessionPage() {
 
 The insert's `hours: null` case relies on the trigger computing from times; the `date`, `start_time`, `end_time`, `rate_tier_id`, `note` keys come from the payload. If `tsc` rejects the insert because `hours` is typed non-nullable in the generated `Insert` type, it is not (the column is nullable), so re-run `npm run db:types`.
 
-- [ ] **Step 3: Verify and commit**
+- [x] **Step 3: Verify and commit**
 
 `npx tsc --noEmit && npm test && npm run build`. Then `git add -A` and commit:
 
@@ -1169,7 +1169,7 @@ Claude-Session: https://claude.ai/code/session_01Nz2dMwYkjrRRcXcuVwSWs1"
 - Consumes: `usePortalContext` (Task 4); `SessionForm` (Task 5); helpers from Task 3; `Period`, `currentPeriod`, `parseMonthInput`, `toMonthInput`, `periodLabel` from `src/lib/tm/periods.ts`; view `tm_timesheet_entries_tutor_view`, table `tm_submissions`, RPC `tm_submit_month` (Task 2).
 - Produces: `<TimesheetMonth period onPeriodChange />`.
 
-- [ ] **Step 1: The month component**
+- [x] **Step 1: The month component**
 
 Create `src/components/portal/timesheet-month.tsx`:
 
@@ -1474,7 +1474,7 @@ function StatusBadge({ state }: { state: SubmissionState }) {
 
 Note on the edit: `SessionForm` produces `hours: null` whenever both times are set, which makes the trigger recompute hours; when the tutor types hours instead, both times are sent as null. That satisfies the carry-forward rule.
 
-- [ ] **Step 2: Page**
+- [x] **Step 2: Page**
 
 Replace `src/app/portal/timesheet/page.tsx` with:
 
@@ -1508,7 +1508,7 @@ export default function MyTimesheetPage() {
 }
 ```
 
-- [ ] **Step 3: Verify and commit**
+- [x] **Step 3: Verify and commit**
 
 `npx tsc --noEmit && npm test && npm run build`. Manual check (optional if the e2e in Task 7 is about to run): with the e2e tutor signed in via the helper flow, `/portal/timesheet` shows the month picker and either the empty state or the seeded data.
 
