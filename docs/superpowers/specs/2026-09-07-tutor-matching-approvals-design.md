@@ -27,13 +27,14 @@ Every function below is `LANGUAGE plpgsql SECURITY DEFINER SET search_path = pub
 
 `p_patch` carries the full set of editable fields, the same six the tutor form sends: `date`, `start_time`, `end_time`, `hours`, `rate_tier_id`, `note`. Keys absent from the patch are treated as null.
 
-1. `SELECT ... FOR UPDATE` the entry. Missing: `P0002` "Session not found".
+1. `SELECT ... FOR UPDATE` the entry's submission first, then the entry, so locks are taken in the same order as `tm_approve_submission` (submission, then entries) and the two cannot deadlock. Missing entry: `P0002` "Session not found".
 2. Status must be `submitted`: otherwise "Only sessions waiting for approval can be edited here".
-3. `rate_tier_id` is required: "Choose a rate tier". The tier must belong to the entry's assignment: `23503` "rate tier does not belong to this assignment".
-4. Work out the effective hours: the patch's `hours` when given, else the rounded difference between the two times (the same rule as `tm_set_entry_hours`). If `date`, `start_time`, `end_time`, effective hours, `rate_tier_id`, and `note` all equal the current row, return the entry id without writing anything.
-5. Insert `tm_entry_edits (entry_id, edited_by, previous)` with `edited_by = auth.uid()` and `previous = jsonb_build_object('date', ..., 'start_time', ..., 'end_time', ..., 'hours', ..., 'tier_label', ..., 'note', ...)` from the current row.
-6. Update the entry. When `rate_tier_id` changed, set `tier_label`, `parent_rate`, `tutor_rate` from the tier (the snapshot trigger skips admins). Set `hours` to the patch value, which is null when both times are given so the existing `tm_set_entry_hours` trigger recomputes it. `status` and `submission_id` are untouched.
-7. Return the entry id.
+3. `date` is required: "Enter the session date". The date's year and month must match the entry's submission: otherwise "The date must stay in the submitted month".
+4. `rate_tier_id` is required: "Choose a rate tier". The tier must belong to the entry's assignment: `23503` "rate tier does not belong to this assignment".
+5. Work out the effective hours: the patch's `hours` when given, else the rounded difference between the two times (the same rule as `tm_set_entry_hours`). If `date`, `start_time`, `end_time`, effective hours, `rate_tier_id`, and `note` all equal the current row, return the entry id without writing anything.
+6. Insert `tm_entry_edits (entry_id, edited_by, previous)` with `edited_by = auth.uid()` and `previous = jsonb_build_object('date', ..., 'start_time', ..., 'end_time', ..., 'hours', ..., 'tier_label', ..., 'note', ...)` from the current row.
+7. Update the entry. When `rate_tier_id` changed, set `tier_label`, `parent_rate`, `tutor_rate` from the tier (the snapshot trigger skips admins). Set `hours` to the patch value, which is null when both times are given so the existing `tm_set_entry_hours` trigger recomputes it. `status` and `submission_id` are untouched.
+8. Return the entry id.
 
 The `tm_guard_locked_month` trigger already lets admins through, and `tm_touch_updated_at` stamps the row.
 

@@ -44,6 +44,7 @@ export const NAV_ITEMS: Record<Workspace, NavItem[]> = {
   ],
   tm: [
     { label: "Dashboard", href: "/tm" },
+    { label: "Pending Approvals", href: "/tm/approvals" },
     { label: "Tutors", href: "/tm/tutors" },
     { label: "Students & Assignments", href: "/tm/students" },
     { label: "Master List", href: "/tm/master-list" },

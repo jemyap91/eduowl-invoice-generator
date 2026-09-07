@@ -1380,6 +1380,18 @@ export type Database = {
         }
         Returns: string
       }
+      tm_approve_submission: {
+        Args: { p_submission_id: string }
+        Returns: string
+      }
+      tm_edit_entry: {
+        Args: { p_entry_id: string; p_patch: Json }
+        Returns: string
+      }
+      tm_return_submission: {
+        Args: { p_reason: string; p_submission_id: string }
+        Returns: undefined
+      }
       tm_save_assignment: {
         Args: { p_assignment: Json; p_id?: string; p_tiers: Json }
         Returns: string
