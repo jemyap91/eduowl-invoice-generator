@@ -36,6 +36,7 @@ describe("NAV_ITEMS", () => {
   it("lists the tutor matching admin screens in order", () => {
     expect(NAV_ITEMS.tm.map((i) => [i.label, i.href])).toEqual([
       ["Dashboard", "/tm"],
+      ["Pending Approvals", "/tm/approvals"],
       ["Tutors", "/tm/tutors"],
       ["Students & Assignments", "/tm/students"],
       ["Master List", "/tm/master-list"],
