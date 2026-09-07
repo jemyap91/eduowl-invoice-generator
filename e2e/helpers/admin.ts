@@ -98,10 +98,10 @@ export async function createSubmittedMonth(tutorName: string, studentName: strin
   const { data: tier, error: tierErr } = await admin.from("tm_rate_tiers").select("id").eq("assignment_id", ids.assignmentId).single()
   if (tierErr) throw tierErr
   const now = new Date()
-  const year = now.getFullYear()
-  const month = now.getMonth() + 1
+  const year = now.getUTCFullYear()
+  const month = now.getUTCMonth() + 1
   const first = `${year}-${String(month).padStart(2, "0")}-01`
-  const today = `${year}-${String(month).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`
+  const today = `${year}-${String(month).padStart(2, "0")}-${String(now.getUTCDate()).padStart(2, "0")}`
 
   const { data: submission, error: sErr } = await admin
     .from("tm_submissions")

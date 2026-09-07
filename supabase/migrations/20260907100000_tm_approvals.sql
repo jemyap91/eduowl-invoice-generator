@@ -15,6 +15,8 @@ AS $$
 DECLARE
   v_entry public.tm_timesheet_entries%ROWTYPE;
   v_tier public.tm_rate_tiers%ROWTYPE;
+  v_submission_id UUID;
+  v_sub public.tm_submissions%ROWTYPE;
   v_date DATE;
   v_start TIME;
   v_end TIME;
@@ -28,6 +30,14 @@ BEGIN
     RAISE EXCEPTION 'Only admins can edit submitted sessions' USING ERRCODE = '42501';
   END IF;
 
+  -- Lock the submission before the entry, same order as tm_approve_submission, so the two cannot deadlock.
+  SELECT submission_id INTO v_submission_id FROM public.tm_timesheet_entries WHERE id = p_entry_id;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Session not found' USING ERRCODE = 'P0002';
+  END IF;
+  IF v_submission_id IS NOT NULL THEN
+    SELECT * INTO v_sub FROM public.tm_submissions WHERE id = v_submission_id FOR UPDATE;
+  END IF;
   SELECT * INTO v_entry FROM public.tm_timesheet_entries WHERE id = p_entry_id FOR UPDATE;
   IF NOT FOUND THEN
     RAISE EXCEPTION 'Session not found' USING ERRCODE = 'P0002';
@@ -45,6 +55,9 @@ BEGIN
 
   IF v_date IS NULL THEN
     RAISE EXCEPTION 'Enter the session date' USING ERRCODE = '22023';
+  END IF;
+  IF EXTRACT(YEAR FROM v_date)::int <> v_sub.year OR EXTRACT(MONTH FROM v_date)::int <> v_sub.month THEN
+    RAISE EXCEPTION 'The date must stay in the submitted month' USING ERRCODE = '22023';
   END IF;
   IF v_tier_id IS NULL THEN
     RAISE EXCEPTION 'Choose a rate tier' USING ERRCODE = '22023';

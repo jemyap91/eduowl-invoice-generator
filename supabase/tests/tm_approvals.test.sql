@@ -1,6 +1,6 @@
 BEGIN;
 CREATE EXTENSION IF NOT EXISTS pgtap WITH SCHEMA extensions;
-SELECT plan(43);
+SELECT plan(44);
 
 -- Users: tutor A, tutor B, admin (the signup trigger makes this email an admin)
 INSERT INTO auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
@@ -43,12 +43,14 @@ SELECT throws_ok($$ SELECT tm_edit_entry('f2000000-0000-0000-0000-000000000003',
   '22023', NULL, 'a draft entry cannot be edited here');
 SELECT throws_ok($$ SELECT tm_edit_entry('00000000-0000-0000-0000-000000000000', '{"date":"2000-01-15","hours":1,"rate_tier_id":"e2000000-0000-0000-0000-000000000001"}') $$,
   'P0002', NULL, 'unknown entry');
-SELECT throws_ok($$ SELECT tm_edit_entry('f2000000-0000-0000-0000-000000000001', '{"date":"2026-01-01","hours":1}') $$,
+SELECT throws_ok(format($q$ SELECT tm_edit_entry('f2000000-0000-0000-0000-000000000001', '{"date":"%s","hours":1}') $q$, date_trunc('month', current_date)::date),
   '22023', NULL, 'a tier is required');
-SELECT throws_ok($$ SELECT tm_edit_entry('f2000000-0000-0000-0000-000000000001', '{"date":"2026-01-01","hours":1,"rate_tier_id":"e2000000-0000-0000-0000-000000000003"}') $$,
+SELECT throws_ok(format($q$ SELECT tm_edit_entry('f2000000-0000-0000-0000-000000000001', '{"date":"%s","hours":1,"rate_tier_id":"e2000000-0000-0000-0000-000000000003"}') $q$, date_trunc('month', current_date)::date),
   '23503', NULL, 'the tier must belong to the entry''s assignment');
-SELECT throws_ok($$ SELECT tm_edit_entry('f2000000-0000-0000-0000-000000000001', '{"date":"2026-01-01","hours":0,"rate_tier_id":"e2000000-0000-0000-0000-000000000001"}') $$,
+SELECT throws_ok(format($q$ SELECT tm_edit_entry('f2000000-0000-0000-0000-000000000001', '{"date":"%s","hours":0,"rate_tier_id":"e2000000-0000-0000-0000-000000000001"}') $q$, date_trunc('month', current_date)::date),
   '22023', NULL, 'hours must be positive');
+SELECT throws_ok(format($q$ SELECT tm_edit_entry('f2000000-0000-0000-0000-000000000001', '{"date":"%s","hours":1.5,"rate_tier_id":"e2000000-0000-0000-0000-000000000001"}') $q$, to_char(date_trunc('month', current_date) - interval '1 month', 'YYYY-MM') || '-15'),
+  '22023', NULL, 'the date must stay in the submitted month');
 
 -- An unchanged patch writes no audit row
 SELECT lives_ok(format($q$ SELECT tm_edit_entry('f2000000-0000-0000-0000-000000000001', '{"date":"%s","hours":1.5,"rate_tier_id":"e2000000-0000-0000-0000-000000000001","note":"first"}') $q$, date_trunc('month', current_date)::date),
