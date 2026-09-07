@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
 import { ApprovalQueue } from "@/components/tm/approval-queue"
+import { SubmissionReview } from "@/components/tm/submission-review"
 import {
   mapQueueRow, mapReturnedRow, outstandingReturns,
   type QueueSubmission, type RawQueueRow, type RawReturnedRow, type ReturnedSubmission,
@@ -81,8 +82,7 @@ function Approvals() {
         </Card>
       )
     }
-    // Task 5 replaces this with <SubmissionReview submission={submission} onChanged={load} onDone={() => router.push("/tm/approvals")} />
-    return <Card><CardContent className="py-6 text-sm">{submission.code}</CardContent></Card>
+    return <SubmissionReview submission={submission} onChanged={load} onDone={() => router.push("/tm/approvals")} />
   }
 
   return <ApprovalQueue queue={queue} returned={returned} onReview={(id) => router.push(`/tm/approvals?submission=${id}`)} />
