@@ -72,17 +72,58 @@ export async function createAssignmentForTutor(tutorName: string, studentName: s
   return { tutorId: tutor.id, studentId: student.id, assignmentId: assignment.id }
 }
 
-/** Removes submissions, entries, assignments, and the student created by createAssignmentForTutor. */
+/** Removes invoices, entries (edits cascade), submissions, assignments, and the student created by the fixtures. */
 export async function deleteAssignmentData(studentName: string) {
   const admin = adminClient()
   const { data: students } = await admin.from("tm_students").select("id").eq("name", studentName)
   for (const s of students ?? []) {
     const { data: assignments } = await admin.from("tm_assignments").select("id").eq("student_id", s.id)
     for (const a of assignments ?? []) {
+      await admin.from("tm_invoices").delete().eq("assignment_id", a.id)
       await admin.from("tm_timesheet_entries").delete().eq("assignment_id", a.id)
       await admin.from("tm_submissions").delete().eq("assignment_id", a.id)
       await admin.from("tm_assignments").delete().eq("id", a.id)
     }
     await admin.from("tm_students").delete().eq("id", s.id)
   }
+}
+
+/**
+ * An assignment with two submitted sessions in the current month (1.5 h and 2 h at the "1 to 1" tier),
+ * locked under one submission, exactly as tm_submit_month would leave them.
+ */
+export async function createSubmittedMonth(tutorName: string, studentName: string, code: string) {
+  const admin = adminClient()
+  const ids = await createAssignmentForTutor(tutorName, studentName, code)
+  const { data: tier, error: tierErr } = await admin.from("tm_rate_tiers").select("id").eq("assignment_id", ids.assignmentId).single()
+  if (tierErr) throw tierErr
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = now.getMonth() + 1
+  const first = `${year}-${String(month).padStart(2, "0")}-01`
+  const today = `${year}-${String(month).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`
+
+  const { data: submission, error: sErr } = await admin
+    .from("tm_submissions")
+    .insert({ assignment_id: ids.assignmentId, tutor_id: ids.tutorId, year, month, status: "submitted" })
+    .select("id").single()
+  if (sErr) throw sErr
+
+  const base = { assignment_id: ids.assignmentId, tutor_id: ids.tutorId, rate_tier_id: tier.id, tier_label: "1 to 1", parent_rate: 70, tutor_rate: 50, status: "submitted", submission_id: submission.id }
+  const { error: eErr } = await admin.from("tm_timesheet_entries").insert([
+    { ...base, date: first, hours: 1.5, note: "E2E first session" },
+    { ...base, date: today, hours: 2, note: "E2E second session" },
+  ])
+  if (eErr) throw eErr
+  return { ...ids, submissionId: submission.id as string }
+}
+
+export async function findGeneratedInvoice(assignmentId: string) {
+  const { data } = await adminClient()
+    .from("tm_invoices")
+    .select("invoice_number, invoice_amount, tutor_payout, total_hours")
+    .eq("assignment_id", assignmentId)
+    .eq("source", "generated")
+    .maybeSingle()
+  return data
 }
