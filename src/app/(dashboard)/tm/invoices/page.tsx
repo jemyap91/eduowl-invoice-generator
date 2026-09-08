@@ -21,6 +21,7 @@ import { whatsappText } from "@/lib/tm/whatsapp"
 import { loadInvoiceContext } from "@/components/tm/invoice-data"
 import { DeleteDialog, InvoiceMenu, PaidDialog, type InvoiceActionHandlers, type PaidWhich } from "@/components/tm/invoice-actions"
 import { ManualInvoiceDialog } from "@/components/tm/manual-invoice-form"
+import { InvoiceDetail } from "@/components/tm/invoice-detail"
 
 function Invoices() {
   const params = useSearchParams()
@@ -86,8 +87,16 @@ function Invoices() {
 
   const handlers: InvoiceActionHandlers = {
     onCopy: copyWhatsapp,
-    // Task 6 replaces this with the PDF download.
-    onDownload: () => toast({ title: "Download PDF arrives in the next task" }),
+    onDownload: async (row) => {
+      try {
+        const { downloadInvoicePdf } = await import("@/components/tm/invoice-download")
+        await downloadInvoicePdf(row)
+        toast({ title: "Invoice PDF downloaded" })
+      } catch (e) {
+        console.error("PDF generation error:", e)
+        toast({ title: "Failed to generate PDF", description: e instanceof Error ? e.message : String(e), variant: "destructive" })
+      }
+    },
     onPaid: (row, which) => setPaidTarget({ row, which }),
     onDelete: (row) => setDeleteTarget(row),
   }
@@ -107,8 +116,13 @@ function Invoices() {
         </Card>
       )
     }
-    // Task 6 replaces this with <InvoiceDetail row={row} handlers={handlers} onChanged={load} backHref={listHref} />
-    return <Card><CardContent className="py-6 text-sm">{row.invoice_number}</CardContent></Card>
+    return (
+      <>
+        <InvoiceDetail row={row} handlers={handlers} onChanged={load} backHref={listHref} />
+        <PaidDialog target={paidTarget} onClose={() => setPaidTarget(null)} onSaved={load} />
+        <DeleteDialog target={deleteTarget} onClose={() => setDeleteTarget(null)} onDeleted={() => { setDeleteTarget(null); router.push(listHref); load() }} />
+      </>
+    )
   }
 
   return (
