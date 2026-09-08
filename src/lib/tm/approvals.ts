@@ -272,3 +272,28 @@ export function entryToSessionInput(e: ApprovalEntry): SessionInput {
 export function patchFromPayload(p: SessionPayload): EntryPatch {
   return { date: p.date, start_time: p.start_time, end_time: p.end_time, hours: p.hours, rate_tier_id: p.rate_tier_id, note: p.note }
 }
+
+export interface RateLine {
+  tierLabel: string
+  rate: number
+  hours: number
+  total: number
+}
+
+/** One line per (tier label, parent rate) in first-seen order; each total rounded once, like tm_approve_submission. */
+export function invoiceLines(entries: Pick<ApprovalEntry, "tier_label" | "parent_rate" | "hours">[]): RateLine[] {
+  const lines = new Map<string, { tierLabel: string; rate: number; hourCents: number; tenThousandths: number }>()
+  for (const e of entries) {
+    const key = `${e.tier_label}|${e.parent_rate}`
+    const line = lines.get(key) ?? { tierLabel: e.tier_label, rate: e.parent_rate, hourCents: 0, tenThousandths: 0 }
+    line.hourCents += cents(e.hours)
+    line.tenThousandths += cents(e.hours) * cents(e.parent_rate)
+    lines.set(key, line)
+  }
+  return Array.from(lines.values()).map((l) => ({
+    tierLabel: l.tierLabel,
+    rate: l.rate,
+    hours: l.hourCents / 100,
+    total: Math.round(l.tenThousandths / 100) / 100,
+  }))
+}

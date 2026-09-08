@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import {
   summariseEntries, entryAmount, groupByTutor, outstandingReturns, describeEdit, entryToSessionInput, patchFromPayload,
-  sortEntries, mapQueueRow, mapReturnedRow, type ApprovalEntry, type QueueSubmission, type ReturnedSubmission,
+  sortEntries, mapQueueRow, mapReturnedRow, invoiceLines, type ApprovalEntry, type QueueSubmission, type ReturnedSubmission,
 } from "./approvals"
 
 function entry(over: Partial<ApprovalEntry>): ApprovalEntry {
@@ -124,5 +124,29 @@ describe("mappers", () => {
     expect(mapReturnedRow({ id: "s2", assignment_id: "a1", year: 2026, month: 8, reviewed_at: null, return_reason: "Check", tm_assignments: null, tm_tutors: null })).toEqual({
       id: "s2", assignment_id: "a1", code: "", subject: "", studentName: "", tutorName: "", year: 2026, month: 8, reviewed_at: null, return_reason: "Check",
     })
+  })
+})
+
+describe("invoiceLines", () => {
+  it("makes one line per tier label and rate, in first-seen order, with summed hours", () => {
+    const lines = invoiceLines([
+      { tier_label: "1 to 1", parent_rate: 70, hours: 1.5 },
+      { tier_label: "Group", parent_rate: 40, hours: 2 },
+      { tier_label: "1 to 1", parent_rate: 70, hours: 1 },
+    ])
+    expect(lines).toEqual([
+      { tierLabel: "1 to 1", rate: 70, hours: 2.5, total: 175 },
+      { tierLabel: "Group", rate: 40, hours: 2, total: 80 },
+    ])
+  })
+  it("rounds each line once, half away from zero, like tm_approve_submission", () => {
+    const lines = invoiceLines([
+      { tier_label: "A", parent_rate: 10.01, hours: 0.5 },
+      { tier_label: "B", parent_rate: 10.01, hours: 0.5 },
+    ])
+    expect(lines.map((l) => l.total)).toEqual([5.01, 5.01])
+  })
+  it("is empty for no entries", () => {
+    expect(invoiceLines([])).toEqual([])
   })
 })
