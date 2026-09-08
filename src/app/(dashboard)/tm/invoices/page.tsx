@@ -14,6 +14,13 @@ import {
   INVOICE_SELECT, filterFromParams, filterInvoices, filterToParams, mapInvoiceRow,
   type InvoiceFilter, type InvoiceRow, type RawInvoiceRow,
 } from "@/lib/tm/invoices"
+import { Button } from "@/components/ui/button"
+import { Plus } from "lucide-react"
+import { invoiceLines } from "@/lib/tm/approvals"
+import { whatsappText } from "@/lib/tm/whatsapp"
+import { loadInvoiceContext } from "@/components/tm/invoice-data"
+import { DeleteDialog, InvoiceMenu, PaidDialog, type InvoiceActionHandlers, type PaidWhich } from "@/components/tm/invoice-actions"
+import { ManualInvoiceDialog } from "@/components/tm/manual-invoice-form"
 
 function Invoices() {
   const params = useSearchParams()
@@ -24,6 +31,9 @@ function Invoices() {
   const [error, setError] = useState<string | null>(null)
   const filter = useMemo(() => filterFromParams(params), [params])
   const selectedId = params.get("invoice")
+  const [paidTarget, setPaidTarget] = useState<{ row: InvoiceRow; which: PaidWhich } | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<InvoiceRow | null>(null)
+  const [manualOpen, setManualOpen] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -59,6 +69,29 @@ function Invoices() {
   const tutorNames = useMemo(() => Array.from(new Set(rows.map((r) => r.tutorName).filter(Boolean))).sort(), [rows])
   const studentNames = useMemo(() => Array.from(new Set(rows.map((r) => r.studentName).filter(Boolean))).sort(), [rows])
 
+  async function copyWhatsapp(row: InvoiceRow) {
+    try {
+      const { settings, entries } = await loadInvoiceContext(row)
+      const text = whatsappText({
+        parentName: row.parentName, studentName: row.studentName, subject: row.subject,
+        period: { year: row.year, month: row.month }, totalHours: row.total_hours,
+        lines: invoiceLines(entries), invoiceAmount: row.invoice_amount, paymentDetails: settings.payment_details,
+      })
+      await navigator.clipboard.writeText(text)
+      toast({ title: "WhatsApp text copied" })
+    } catch (e) {
+      toast({ title: "Could not copy", description: e instanceof Error ? e.message : String(e), variant: "destructive" })
+    }
+  }
+
+  const handlers: InvoiceActionHandlers = {
+    onCopy: copyWhatsapp,
+    // Task 6 replaces this with the PDF download.
+    onDownload: () => toast({ title: "Download PDF arrives in the next task" }),
+    onPaid: (row, which) => setPaidTarget({ row, which }),
+    onDelete: (row) => setDeleteTarget(row),
+  }
+
   if (loading) return <Skeleton className="h-96 w-full" />
   if (error) return <Card><CardContent className="py-6 text-sm text-destructive">{error}</CardContent></Card>
 
@@ -80,9 +113,14 @@ function Invoices() {
 
   return (
     <div className="space-y-4">
-      <InvoiceFilters filter={filter} onChange={setFilter} tutorNames={tutorNames} studentNames={studentNames} />
-      {/* Task 5 adds the "New manual invoice" button, the dialogs, and renderActions */}
-      <InvoiceTable rows={visible} detailHref={detailHref} />
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <InvoiceFilters filter={filter} onChange={setFilter} tutorNames={tutorNames} studentNames={studentNames} />
+        <Button size="sm" onClick={() => setManualOpen(true)}><Plus className="mr-2 h-4 w-4" />New manual invoice</Button>
+      </div>
+      <InvoiceTable rows={visible} detailHref={detailHref} renderActions={(row) => <InvoiceMenu row={row} handlers={handlers} />} />
+      <PaidDialog target={paidTarget} onClose={() => setPaidTarget(null)} onSaved={load} />
+      <DeleteDialog target={deleteTarget} onClose={() => setDeleteTarget(null)} onDeleted={load} />
+      <ManualInvoiceDialog open={manualOpen} onOpenChange={setManualOpen} onCreated={load} />
     </div>
   )
 }
