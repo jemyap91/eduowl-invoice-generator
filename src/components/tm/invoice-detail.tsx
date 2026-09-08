@@ -46,7 +46,7 @@ export function InvoiceDetail({ row, handlers, onChanged, backHref }: Props) {
         if (active) setEntries([])
       })
     return () => { active = false }
-  }, [row, toast])
+  }, [row.id, row.source, toast])
 
   useEffect(() => { setRemarks(row.remarks ?? "") }, [row])
 
