@@ -118,6 +118,28 @@ export async function createSubmittedMonth(tutorName: string, studentName: strin
   return { ...ids, submissionId: submission.id as string }
 }
 
+/**
+ * A submitted month that an admin has approved: a generated invoice (3.5 h, $245 / $175) with the
+ * entries and submission marked approved, exactly as tm_approve_submission would leave them.
+ */
+export async function createApprovedMonth(tutorName: string, studentName: string, code: string) {
+  const admin = adminClient()
+  const ids = await createSubmittedMonth(tutorName, studentName, code)
+  const now = new Date()
+  const year = now.getUTCFullYear()
+  const month = now.getUTCMonth() + 1
+  const { data: invoice, error: iErr } = await admin
+    .from("tm_invoices")
+    .insert({ assignment_id: ids.assignmentId, year, month, source: "generated", total_hours: 3.5, invoice_amount: 245, tutor_payout: 175 })
+    .select("id, invoice_number").single()
+  if (iErr) throw iErr
+  const { error: eErr } = await admin.from("tm_timesheet_entries").update({ status: "approved", invoice_id: invoice.id }).eq("submission_id", ids.submissionId)
+  if (eErr) throw eErr
+  const { error: sErr } = await admin.from("tm_submissions").update({ status: "approved", invoice_id: invoice.id, reviewed_at: new Date().toISOString() }).eq("id", ids.submissionId)
+  if (sErr) throw sErr
+  return { ...ids, invoiceId: invoice.id as string, invoiceNumber: invoice.invoice_number as string }
+}
+
 export async function findGeneratedInvoice(assignmentId: string) {
   const { data } = await adminClient()
     .from("tm_invoices")
