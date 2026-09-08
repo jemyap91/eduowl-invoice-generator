@@ -1384,6 +1384,7 @@ export type Database = {
         Args: { p_submission_id: string }
         Returns: string
       }
+      tm_delete_invoice: { Args: { p_invoice_id: string }; Returns: undefined }
       tm_edit_entry: {
         Args: { p_entry_id: string; p_patch: Json }
         Returns: string
