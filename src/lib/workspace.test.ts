@@ -37,6 +37,7 @@ describe("NAV_ITEMS", () => {
     expect(NAV_ITEMS.tm.map((i) => [i.label, i.href])).toEqual([
       ["Dashboard", "/tm"],
       ["Pending Approvals", "/tm/approvals"],
+      ["Invoices", "/tm/invoices"],
       ["Tutors", "/tm/tutors"],
       ["Students & Assignments", "/tm/students"],
       ["Master List", "/tm/master-list"],
