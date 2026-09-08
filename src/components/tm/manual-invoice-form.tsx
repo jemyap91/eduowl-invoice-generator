@@ -12,6 +12,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast"
 import { currentPeriod, parseMonthInput, toMonthInput } from "@/lib/tm/periods"
 
+const MONEY = /^\d+(\.\d{1,2})?$/
+function parseMoney(value: string): number | null {
+  const v = value.trim()
+  return MONEY.test(v) ? Number(v) : null
+}
+
 interface AssignmentOption {
   id: string
   code: string
@@ -57,14 +63,14 @@ export function ManualInvoiceDialog({ open, onOpenChange, onCreated }: Props) {
   async function save() {
     setError("")
     const period = parseMonthInput(month)
-    const amountN = Number(amount)
-    const payoutN = Number(payout)
-    const hoursN = hours.trim() === "" ? null : Number(hours)
+    const amountN = parseMoney(amount)
+    const payoutN = parseMoney(payout)
+    const hoursN = hours.trim() === "" ? null : parseMoney(hours)
     if (!assignmentId) { setError("Choose an assignment."); return }
     if (!period) { setError("Enter the month."); return }
-    if (!Number.isFinite(amountN) || amountN <= 0) { setError("Invoice amount must be more than 0."); return }
-    if (!Number.isFinite(payoutN) || payoutN < 0) { setError("Tutor payout must be 0 or more."); return }
-    if (hoursN !== null && (!Number.isFinite(hoursN) || hoursN <= 0)) { setError("Hours must be more than 0, or blank."); return }
+    if (amountN === null || amountN <= 0) { setError("Invoice amount must be more than 0, with up to two decimals."); return }
+    if (payoutN === null || payoutN < 0) { setError("Tutor payout must be 0 or more, with up to two decimals."); return }
+    if (hours.trim() !== "" && (hoursN === null || hoursN <= 0)) { setError("Hours must be more than 0, with up to two decimals, or blank."); return }
 
     setBusy(true)
     const supabase = createClient()

@@ -152,7 +152,7 @@ Title "New manual invoice". Fields: Assignment (select, "{code} · {student} · 
 
 `src/components/tm/invoice-pdf.tsx` exports `TmInvoicePDF(props)` with props `{ legalName, companyName, logoUrl, qrCodeUrl, parentName, address, studentName, period, invoiceNumber, lines: { description; hours: number | null; rate: number | null; total: number }[], subtotal, paymentTerms, paynowUen }`. Layout, matching the Mr Eric template: navy (`#2E3192`) top bar; "EduOwl" large in navy with "Education Consultancy Pte. Ltd." beneath; owl logo top right; "Invoice for: {parent or student}" with the address lines beneath; "{student}, {Month Year}" and the muted invoice number; table Description, Hours, Hourly Rate, Total price; "Payment Methods:" with the terms text, "By PAYNOW:" then "UEN: {uen}", "By QR:" with the QR image; Subtotal right of the payment title; large total bottom right. Fonts as the Academy component (Assistant). Tutor payout never appears.
 
-`src/components/tm/invoice-download-button.tsx` loads `tm_settings`, the entries (generated only), converts `/tm/logo.png` and the settings `qr_code_path` to data URIs, renders with `pdf(...).toBlob()`, and downloads as `invoiceFileName(row)`. Loaded with `next/dynamic` (`ssr: false`) as the Academy list does. Toasts "Invoice PDF downloaded" / "Failed to generate PDF".
+`src/components/tm/invoice-download.tsx` exports `downloadInvoicePdf(row)`, which loads `tm_settings`, the entries (generated only), converts `/tm/logo.png` and the settings `qr_code_path` to data URIs, renders with `pdf(...).toBlob()`, and downloads as `invoiceFileName(row)`. Loaded with a dynamic `import()` inside the download handler, not `next/dynamic`. Toasts "Invoice PDF downloaded" / "Failed to generate PDF".
 
 ### `/tm` (dashboard)
 

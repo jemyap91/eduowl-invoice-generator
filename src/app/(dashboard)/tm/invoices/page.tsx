@@ -101,7 +101,7 @@ function Invoices() {
     onDelete: (row) => setDeleteTarget(row),
   }
 
-  if (loading) return <Skeleton className="h-96 w-full" />
+  if (loading && rows.length === 0) return <Skeleton className="h-96 w-full" />
   if (error) return <Card><CardContent className="py-6 text-sm text-destructive">{error}</CardContent></Card>
 
   if (selectedId) {

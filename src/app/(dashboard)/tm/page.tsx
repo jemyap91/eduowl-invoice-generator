@@ -50,7 +50,7 @@ export default function TutorMatchingDashboardPage() {
   const owed = useMemo(() => outstanding(invoices), [invoices])
   const oldest = useMemo(() => oldestPending(pending, 5), [pending])
 
-  if (loading) return <Skeleton className="h-96 w-full" />
+  if (loading && invoices.length === 0 && pending.length === 0) return <Skeleton className="h-96 w-full" />
   if (error) return <Card><CardContent className="py-6 text-sm text-destructive">{error}</CardContent></Card>
 
   return (

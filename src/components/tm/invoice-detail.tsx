@@ -48,7 +48,7 @@ export function InvoiceDetail({ row, handlers, onChanged, backHref }: Props) {
     return () => { active = false }
   }, [row.id, row.source, toast])
 
-  useEffect(() => { setRemarks(row.remarks ?? "") }, [row])
+  useEffect(() => { setRemarks(row.remarks ?? "") }, [row.id, row.remarks])
 
   async function saveRemarks() {
     setSaving(true)
