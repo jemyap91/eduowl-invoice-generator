@@ -33,7 +33,7 @@ const ICONS: Record<string, LucideIcon> = {
   Settings: Settings,
   "Students & Assignments": GraduationCap,
   "Master List": Table2,
-  "Pending Approvals": ClipboardCheck,
+  "Pending Timesheets": ClipboardCheck,
 };
 
 function SidebarContent({ onNavClick, collapsed }: { onNavClick?: () => void; collapsed?: boolean }) {

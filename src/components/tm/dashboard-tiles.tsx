@@ -26,7 +26,7 @@ function Tile({ title, value, sub, href }: { title: string; value: string; sub?:
 export function DashboardTiles({ figures, outstanding }: Props) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <Tile title="Pending approvals" value={String(figures.pending)} href="/tm/approvals" />
+      <Tile title="Pending timesheets" value={String(figures.pending)} href="/tm/approvals" />
       <Tile title="Invoiced" value={formatCurrency(figures.invoiced)} />
       <Tile title="Tutor payouts" value={formatCurrency(figures.payouts)} />
       <Tile title="Profit" value={formatCurrency(figures.profit)} />

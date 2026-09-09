@@ -1,6 +1,6 @@
 # Tutor Matching Slice 4: Approvals - Design
 
-Refines Section 5 "Pending Approvals" of `2026-09-04-tutor-matching-design.md` into a buildable slice. That document remains the source for the data model (Section 3), RLS matrix, and the overall build order. Where this document is more specific, it wins.
+Refines Section 5 "Pending Timesheets" of `2026-09-04-tutor-matching-design.md` into a buildable slice. That document remains the source for the data model (Section 3), RLS matrix, and the overall build order. Where this document is more specific, it wins.
 
 ## 1. Summary
 
@@ -89,11 +89,11 @@ The page is a client component using the browser Supabase client under the admin
 
 ### Navigation
 
-`NAV_ITEMS.tm` gains `{ label: "Pending Approvals", href: "/tm/approvals" }` immediately after Dashboard. The sidebar icon map adds `"Pending Approvals": ClipboardCheck`.
+`NAV_ITEMS.tm` gains `{ label: "Pending Timesheets", href: "/tm/approvals" }` immediately after Dashboard. The sidebar icon map adds `"Pending Timesheets": ClipboardCheck`.
 
 ### `/tm/approvals` (queue)
 
-- Heading "Pending Approvals".
+- Heading "Pending Timesheets".
 - Loading: skeletons. Load error: toast plus an inline message. Empty queue: a card saying "Nothing is waiting for approval."
 - One card per tutor, title is the tutor name. Table columns: Code, Student, Subject, Month, Sessions, Hours, Invoice, Payout, Profit, and a "Review" button that navigates to `?submission=<id>`.
 - Below, card "Returned, awaiting resubmission" with columns Tutor, Student, Code, Month, Returned (date), Reason. Hidden when empty.
@@ -112,7 +112,7 @@ The page is a client component using the browser Supabase client under the admin
 - **Send back**: title "Send back to {tutor}", a required textarea labelled "Reason", buttons Cancel and "Send back". Calls `tm_return_submission`. Success toast "Sent back to {tutor}", then navigates to the queue.
 - **Approve**: title "Approve {student}, {month label}", body repeats the totals, buttons Cancel and "Approve". Calls `tm_approve_submission`, then reads `invoice_number` for the returned id. Success toast "Approved" with description "Invoice {number} created.", then navigates to the queue. Failure toast "Could not approve" with the error message.
 
-Copy that must appear verbatim: "Pending Approvals", "Returned, awaiting resubmission", "Nothing is waiting for approval.", "Send back", "Approve", "Edited", "Session updated", "Sent back to {tutor}", "Invoice {number} created."
+Copy that must appear verbatim: "Pending Timesheets", "Returned, awaiting resubmission", "Nothing is waiting for approval.", "Send back", "Approve", "Edited", "Session updated", "Sent back to {tutor}", "Invoice {number} created."
 
 ## 6. Error handling
 

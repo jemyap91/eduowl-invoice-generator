@@ -71,7 +71,7 @@ The existing middleware keeps its session check and adds one profile lookup:
 
 - Dropdown at the top of the sidebar with two entries: **EduOwl English Academy** (existing routes, rebranded, features unchanged) and **Tutor Matching** (`/tm/*`). A third entry, **Tutor portal**, appears for admins linked to a tutor row.
 - Selected workspace is stored in a cookie `workspace=academy|tm`. Landing on `/` with `workspace=tm` redirects to `/tm`.
-- Sidebar nav items are chosen by workspace. Tutor Matching items: Dashboard `/tm`, Pending Approvals `/tm/approvals`, Invoices `/tm/invoices`, Tutors `/tm/tutors`, Students & Assignments `/tm/students`, Master List `/tm/master-list`, Settings `/tm/settings`.
+- Sidebar nav items are chosen by workspace. Tutor Matching items: Dashboard `/tm`, Pending Timesheets `/tm/approvals`, Invoices `/tm/invoices`, Tutors `/tm/tutors`, Students & Assignments `/tm/students`, Master List `/tm/master-list`, Settings `/tm/settings`.
 - Header page titles extend to the new routes.
 
 ### Tutor portal layout
@@ -272,7 +272,7 @@ No notifications in v1. The admin dashboard pending count is the signal.
 
 Month picker. Six tiles: pending approvals count, total invoiced, total tutor payouts, total profit, outstanding parent payments (count and sum), outstanding tutor payouts (count and sum). Below, the five oldest pending submissions with links into the queue.
 
-### Pending Approvals (`/tm/approvals`)
+### Pending Timesheets (`/tm/approvals`)
 
 - Queue of submissions with status `submitted`, grouped by tutor. Each shows code, student, subject, month, entry count, hours, invoice amount, tutor payout, profit.
 - Opening one shows an editable entry table. Any change to date, times, hours, tier, or note calls a server action that writes a `tm_entry_edits` row first, then updates the entry. Edited rows show an "Edited" badge with a popover of the previous values.

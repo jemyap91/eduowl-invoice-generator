@@ -113,7 +113,7 @@ Rules: `{parent_name}` falls back to "there" when null; `{Month Year}` is the fu
 
 ### Navigation
 
-`NAV_ITEMS.tm` gains `{ label: "Invoices", href: "/tm/invoices" }` immediately after Pending Approvals. The sidebar icon map already has `Invoices: FileText`.
+`NAV_ITEMS.tm` gains `{ label: "Invoices", href: "/tm/invoices" }` immediately after Pending Timesheets. The sidebar icon map already has `Invoices: FileText`.
 
 ### `/tm/invoices` (list)
 
@@ -157,10 +157,10 @@ Title "New manual invoice". Fields: Assignment (select, "{code} · {student} · 
 ### `/tm` (dashboard)
 
 - Month input (default current).
-- Six tiles in a responsive grid: "Pending approvals" (count, links to `/tm/approvals`), "Invoiced", "Tutor payouts", "Profit", "Outstanding parent payments" ("{count} invoices · {sum}", links to `/tm/invoices?month=all&parent_paid=unpaid`), "Outstanding tutor payouts" (links to `/tm/invoices?month=all&tutor_paid=unpaid`). Tile values use `formatCurrency`.
+- Six tiles in a responsive grid: "Pending timesheets" (count, links to `/tm/approvals`), "Invoiced", "Tutor payouts", "Profit", "Outstanding parent payments" ("{count} invoices · {sum}", links to `/tm/invoices?month=all&parent_paid=unpaid`), "Outstanding tutor payouts" (links to `/tm/invoices?month=all&tutor_paid=unpaid`). Tile values use `formatCurrency`.
 - Card "Oldest pending submissions": up to five rows with Tutor, Student, Code, Month, Submitted (date), and a "Review" link to `/tm/approvals?submission=<id>`. Empty state "Nothing is waiting for approval."
 
-Copy that must appear verbatim: "Invoices", "New manual invoice", "All months", "No invoices match these filters.", "Copy WhatsApp text", "Download PDF", "Mark parent paid", "Mark tutor paid", "Delete", "WhatsApp text copied", "Parent payment recorded", "Tutor payout recorded", "Invoice deleted", "Invoice {number} created.", "Remarks saved", "Back to invoices", "Pending approvals", "Outstanding parent payments", "Outstanding tutor payouts", "Oldest pending submissions".
+Copy that must appear verbatim: "Invoices", "New manual invoice", "All months", "No invoices match these filters.", "Copy WhatsApp text", "Download PDF", "Mark parent paid", "Mark tutor paid", "Delete", "WhatsApp text copied", "Parent payment recorded", "Tutor payout recorded", "Invoice deleted", "Invoice {number} created.", "Remarks saved", "Back to invoices", "Pending timesheets", "Outstanding parent payments", "Outstanding tutor payouts", "Oldest pending submissions".
 
 ## 6. Error handling
 
