@@ -25,13 +25,18 @@ export interface AssignmentWithTiers extends TmAssignment {
 }
 
 export interface StudentWithAssignments extends TmStudent {
+  creator: { name: string } | null
   assignments: AssignmentWithTiers[]
+}
+
+export function needsParentRate(a: AssignmentWithTiers): boolean {
+  return a.tm_rate_tiers.some((t) => t.parent_rate == null)
 }
 
 export function formatTierSummary(tiers: TmRateTier[]): string {
   return [...tiers]
     .sort((a, b) => a.sort_order - b.sort_order)
-    .map((t) => `${t.label} $${t.parent_rate}/$${t.tutor_rate}`)
+    .map((t) => `${t.label} ${t.parent_rate == null ? "$?" : `$${t.parent_rate}`}/$${t.tutor_rate}`)
     .join(" · ")
 }
 
@@ -55,7 +60,7 @@ export function StudentList({ onAddAssignment, onEditAssignment, refreshKey = 0 
     setLoading(true)
     const supabase = createClient()
     const [studentsRes, assignmentsRes] = await Promise.all([
-      supabase.from("tm_students").select("*").order("name"),
+      supabase.from("tm_students").select("*, creator:tm_tutors!tm_students_created_by_tutor_id_fkey(name)").order("name"),
       supabase.from("tm_assignments").select("*, tm_tutors(id, name), tm_rate_tiers(*)").order("code"),
     ])
     if (studentsRes.error || assignmentsRes.error) {
@@ -71,7 +76,7 @@ export function StudentList({ onAddAssignment, onEditAssignment, refreshKey = 0 
         monthly_est_profit: toNumber(raw.monthly_est_profit as unknown as string),
         tm_rate_tiers: (raw.tm_rate_tiers || []).map((t) => ({
           ...t,
-          parent_rate: toNumber(t.parent_rate as unknown as string) ?? 0,
+          parent_rate: toNumber(t.parent_rate as unknown as string),
           tutor_rate: toNumber(t.tutor_rate as unknown as string) ?? 0,
         })),
       }
@@ -79,7 +84,8 @@ export function StudentList({ onAddAssignment, onEditAssignment, refreshKey = 0 
       list.push(a)
       byStudent.set(a.student_id, list)
     }
-    setStudents(((studentsRes.data as TmStudent[]) || []).map((s) => ({ ...s, assignments: byStudent.get(s.id) || [] })))
+    setStudents(((studentsRes.data as unknown as (TmStudent & { creator: { name: string } | null })[]) || [])
+      .map((s) => ({ ...s, assignments: byStudent.get(s.id) || [] })))
     setLoading(false)
   }, [toast])
 
@@ -177,13 +183,19 @@ export function StudentList({ onAddAssignment, onEditAssignment, refreshKey = 0 
                         {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                       </Button>
                     </TableCell>
-                    <TableCell className="font-medium">{s.name}</TableCell>
+                    <TableCell className="font-medium">
+                      {s.name}
+                      {s.creator && <span className="block text-xs font-normal text-muted-foreground">Added by {s.creator.name}</span>}
+                    </TableCell>
                     <TableCell>{s.parent_name || "-"}</TableCell>
                     <TableCell>
                       {s.parent_phone || "-"}
                       {s.contact_preference && <span className="ml-2 text-xs text-muted-foreground">({s.contact_preference})</span>}
                     </TableCell>
-                    <TableCell className="text-right">{s.assignments.length}</TableCell>
+                    <TableCell className="text-right">
+                      {s.assignments.some(needsParentRate) && <Badge variant="destructive" className="mr-2">Parent rate needed</Badge>}
+                      {s.assignments.length}
+                    </TableCell>
                     <TableCell>
                       <Button variant="ghost" size="icon" aria-label={`Edit ${s.name}`} onClick={() => { setEditing(s); setDialogOpen(true) }}>
                         <Pencil className="h-4 w-4" />
@@ -272,7 +284,10 @@ function AssignmentsTable({
                 <TableCell>{a.subject}</TableCell>
                 <TableCell>{a.timeslot || "-"}</TableCell>
                 <TableCell className="text-xs">{formatTierSummary(a.tm_rate_tiers) || "-"}</TableCell>
-                <TableCell><Badge variant={a.status === "active" ? "secondary" : "outline"}>{ASSIGNMENT_STATUS_LABELS[a.status]}</Badge></TableCell>
+                <TableCell className="space-x-1 whitespace-nowrap">
+                  <Badge variant={a.status === "active" ? "secondary" : "outline"}>{ASSIGNMENT_STATUS_LABELS[a.status]}</Badge>
+                  {needsParentRate(a) && <Badge variant="destructive">Parent rate needed</Badge>}
+                </TableCell>
                 <TableCell>
                   <Button variant="ghost" size="icon" aria-label={`Edit assignment ${a.code}`} onClick={() => onEdit?.(a, student)}>
                     <Pencil className="h-4 w-4" />

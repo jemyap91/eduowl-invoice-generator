@@ -39,6 +39,7 @@ export interface TmStudent {
   contact_preference: string | null
   address: string | null
   remarks: string | null
+  created_by_tutor_id: string | null
   created_at: string
 }
 
@@ -46,7 +47,8 @@ export interface TmRateTier {
   id: string
   assignment_id: string
   label: string
-  parent_rate: number
+  /** null until admin sets it for a tier a tutor added. */
+  parent_rate: number | null
   tutor_rate: number
   sort_order: number
 }
@@ -96,6 +98,9 @@ export interface TmSettings {
   payment_details: string
   default_rate_tiers: unknown
 }
+
+/** Tutors can only pick these; the rest are admin-only. */
+export const TUTOR_ASSIGNMENT_STATUSES: TmAssignmentStatus[] = ["active", "paused", "stopped"]
 
 /** PostgREST returns numeric columns as strings; normalise before use. */
 export function toNumber(value: string | number | null | undefined): number | null {

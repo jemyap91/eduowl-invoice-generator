@@ -859,7 +859,7 @@ export type Database = {
           created_at: string | null
           id: string
           label: string
-          parent_rate: number
+          parent_rate: number | null
           sort_order: number
           tutor_rate: number
         }
@@ -868,7 +868,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           label: string
-          parent_rate: number
+          parent_rate?: number | null
           sort_order?: number
           tutor_rate: number
         }
@@ -877,7 +877,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           label?: string
-          parent_rate?: number
+          parent_rate?: number | null
           sort_order?: number
           tutor_rate?: number
         }
@@ -932,6 +932,7 @@ export type Database = {
           address: string | null
           contact_preference: string | null
           created_at: string | null
+          created_by_tutor_id: string | null
           id: string
           name: string
           parent_name: string | null
@@ -942,6 +943,7 @@ export type Database = {
           address?: string | null
           contact_preference?: string | null
           created_at?: string | null
+          created_by_tutor_id?: string | null
           id?: string
           name: string
           parent_name?: string | null
@@ -952,13 +954,22 @@ export type Database = {
           address?: string | null
           contact_preference?: string | null
           created_at?: string | null
+          created_by_tutor_id?: string | null
           id?: string
           name?: string
           parent_name?: string | null
           parent_phone?: string | null
           remarks?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tm_students_created_by_tutor_id_fkey"
+            columns: ["created_by_tutor_id"]
+            isOneToOne: false
+            referencedRelation: "tm_tutors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tm_submissions: {
         Row: {
@@ -1034,7 +1045,7 @@ export type Database = {
           id: string
           invoice_id: string | null
           note: string | null
-          parent_rate: number
+          parent_rate: number | null
           rate_tier_id: string | null
           start_time: string | null
           status: string
@@ -1053,7 +1064,7 @@ export type Database = {
           id?: string
           invoice_id?: string | null
           note?: string | null
-          parent_rate: number
+          parent_rate?: number | null
           rate_tier_id?: string | null
           start_time?: string | null
           status?: string
@@ -1072,7 +1083,7 @@ export type Database = {
           id?: string
           invoice_id?: string | null
           note?: string | null
-          parent_rate?: number
+          parent_rate?: number | null
           rate_tier_id?: string | null
           start_time?: string | null
           status?: string
@@ -1389,6 +1400,10 @@ export type Database = {
         Args: { p_entry_id: string; p_patch: Json }
         Returns: string
       }
+      tm_next_assignment_code: {
+        Args: { p_student_name: string }
+        Returns: string
+      }
       tm_return_submission: {
         Args: { p_reason: string; p_submission_id: string }
         Returns: undefined
@@ -1399,6 +1414,10 @@ export type Database = {
       }
       tm_submit_month: {
         Args: { p_assignment_id: string; p_month: number; p_year: number }
+        Returns: string
+      }
+      tm_tutor_save_assignment: {
+        Args: { p_assignment: Json; p_id?: string; p_tiers: Json }
         Returns: string
       }
     }

@@ -61,7 +61,10 @@ export interface HistoryRow {
 export function formatRates(tiers: TmRateTier[], which: "parent" | "tutor"): string {
   return [...tiers]
     .sort((a, b) => a.sort_order - b.sort_order)
-    .map((t) => `${t.label} $${which === "parent" ? t.parent_rate : t.tutor_rate}`)
+    .map((t) => {
+      const rate = which === "parent" ? t.parent_rate : t.tutor_rate
+      return `${t.label} ${rate == null ? "(not set)" : `$${rate}`}`
+    })
     .join(" · ")
 }
 

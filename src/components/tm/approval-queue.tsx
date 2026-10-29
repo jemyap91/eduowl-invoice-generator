@@ -1,12 +1,13 @@
 "use client"
 
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { formatCurrency } from "@/lib/format"
 import { periodLabel } from "@/lib/tm/periods"
 import { formatHours } from "@/lib/portal/timesheet"
-import { groupByTutor, summariseEntries, type QueueSubmission, type ReturnedSubmission } from "@/lib/tm/approvals"
+import { groupByTutor, missingParentRateTiers, summariseEntries, type QueueSubmission, type ReturnedSubmission } from "@/lib/tm/approvals"
 
 interface Props {
   queue: QueueSubmission[]
@@ -51,7 +52,10 @@ export function ApprovalQueue({ queue, returned, onReview }: Props) {
                   const t = summariseEntries(s.entries)
                   return (
                     <TableRow key={s.id}>
-                      <TableCell className="font-medium">{s.code}</TableCell>
+                      <TableCell className="font-medium whitespace-nowrap">
+                        {s.code}
+                        {missingParentRateTiers(s.entries).length > 0 && <Badge variant="destructive" className="ml-2">Parent rate needed</Badge>}
+                      </TableCell>
                       <TableCell>{s.studentName}</TableCell>
                       <TableCell>{s.subject}</TableCell>
                       <TableCell>{periodLabel({ year: s.year, month: s.month })}</TableCell>

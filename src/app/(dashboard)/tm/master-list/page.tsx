@@ -61,7 +61,7 @@ export default function TmMasterListPage() {
         student: tm_students,
         tiers: (tm_rate_tiers || []).map((t) => ({
           ...t,
-          parent_rate: toNumber(t.parent_rate as unknown as string) ?? 0,
+          parent_rate: toNumber(t.parent_rate as unknown as string),
           tutor_rate: toNumber(t.tutor_rate as unknown as string) ?? 0,
         })),
       }

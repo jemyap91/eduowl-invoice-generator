@@ -81,7 +81,7 @@ export function AssignmentForm({
     if (deposit === "invalid") { setError("Deposit must be a number."); return }
     const profit = parseMoney(estProfit)
     if (profit === "invalid") { setError("Monthly estimated profit must be a number."); return }
-    const validated = validateTiers(tiers)
+    const validated = validateTiers(tiers, "optional")
     if (!validated.ok) { setError(validated.error); return }
     await onSubmit({
       code: code.trim().toUpperCase(),
@@ -177,7 +177,10 @@ export function AssignmentForm({
 
         <div className="sm:col-span-2 space-y-2">
           <Label>Rate tiers *</Label>
-          <RateTierEditor value={tiers} onChange={setTiers} idPrefix="asg-tier" />
+          <RateTierEditor value={tiers} onChange={setTiers} idPrefix="asg-tier" parentPlaceholder="Not set" />
+          {tiers.some((t) => t.parent_rate.trim() === "") && (
+            <p className="text-xs text-amber-700">A blank parent rate means it is not set yet. Sessions on that tier cannot be approved into an invoice until it is.</p>
+          )}
         </div>
 
         <div className="space-y-2 sm:col-span-2">

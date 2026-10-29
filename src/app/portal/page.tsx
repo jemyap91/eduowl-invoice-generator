@@ -1,5 +1,5 @@
-import { AssignmentCards } from "@/components/portal/assignment-cards"
+import { MyStudents } from "@/components/portal/my-students"
 
 export default function MyStudentsPage() {
-  return <AssignmentCards />
+  return <MyStudents />
 }

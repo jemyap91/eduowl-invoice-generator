@@ -10,7 +10,8 @@ export interface RateTierDraft {
 
 export type RateTierValue = {
   label: string
-  parent_rate: number
+  /** null until admin sets it; tutors never send one. */
+  parent_rate: number | null
   tutor_rate: number
   sort_order: number
 }
@@ -27,7 +28,7 @@ export function newDraft(partial: Partial<Omit<RateTierDraft, "key">> = {}): Rat
 
 export function draftsFromValues(values: RateTierValue[]): RateTierDraft[] {
   return values.map((v) =>
-    newDraft({ label: v.label, parent_rate: String(v.parent_rate), tutor_rate: String(v.tutor_rate) })
+    newDraft({ label: v.label, parent_rate: v.parent_rate == null ? "" : String(v.parent_rate), tutor_rate: String(v.tutor_rate) })
   )
 }
 
@@ -35,7 +36,7 @@ export function draftsFromTiers(tiers: TmRateTier[]): RateTierDraft[] {
   return [...tiers]
     .sort((a, b) => a.sort_order - b.sort_order)
     .map((t) =>
-      newDraft({ id: t.id, label: t.label, parent_rate: String(t.parent_rate), tutor_rate: String(t.tutor_rate) })
+      newDraft({ id: t.id, label: t.label, parent_rate: t.parent_rate == null ? "" : String(t.parent_rate), tutor_rate: String(t.tutor_rate) })
     )
 }
 
@@ -47,7 +48,13 @@ function parseRate(raw: string): number | null {
 
 export type ValidateResult = { ok: true; tiers: RateTierValue[] } | { ok: false; error: string }
 
-export function validateTiers(drafts: RateTierDraft[]): ValidateResult {
+/**
+ * How the parent rate is checked: "required" (settings templates), "optional" (admin
+ * assignment form; blank means not set yet), or "none" (tutors, who never send one).
+ */
+export type ParentRateMode = "required" | "optional" | "none"
+
+export function validateTiers(drafts: RateTierDraft[], parentRate: ParentRateMode = "required"): ValidateResult {
   if (drafts.length === 0) return { ok: false, error: "Add at least one rate tier." }
   const seen = new Set<string>()
   const tiers: RateTierValue[] = []
@@ -57,10 +64,16 @@ export function validateTiers(drafts: RateTierDraft[]): ValidateResult {
     const lower = label.toLowerCase()
     if (seen.has(lower)) return { ok: false, error: `Tier label "${label}" is used more than once.` }
     seen.add(lower)
-    const parent = parseRate(d.parent_rate)
-    if (parent === null) return { ok: false, error: `Parent rate for "${label}" must be a number of 0 or more.` }
+    let parent: number | null = null
+    if (parentRate === "required" || (parentRate === "optional" && d.parent_rate.trim() !== "")) {
+      parent = parseRate(d.parent_rate)
+      if (parent === null) return { ok: false, error: `Parent rate for "${label}" must be a number of 0 or more.` }
+    }
     const tutor = parseRate(d.tutor_rate)
-    if (tutor === null) return { ok: false, error: `Tutor rate for "${label}" must be a number of 0 or more.` }
+    if (tutor === null) {
+      const name = parentRate === "none" ? "Hourly pay" : "Tutor rate"
+      return { ok: false, error: `${name} for "${label}" must be a number of 0 or more.` }
+    }
     tiers.push({ label, parent_rate: parent, tutor_rate: tutor, sort_order: i })
   }
   return { ok: true, tiers }

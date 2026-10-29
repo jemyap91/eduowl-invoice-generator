@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { validateTiers, parseDefaultTiers, draftsFromValues, newDraft } from "./rate-tiers"
+import { validateTiers, parseDefaultTiers, draftsFromValues, draftsFromTiers, newDraft } from "./rate-tiers"
 
 describe("validateTiers", () => {
   it("accepts well-formed rows and assigns sort_order by position", () => {
@@ -74,5 +74,25 @@ describe("drafts", () => {
     expect(a).toMatchObject({ label: "", parent_rate: "", tutor_rate: "" })
     expect(b.label).toBe("Zoom")
     expect(a.key).not.toBe(b.key)
+  })
+})
+
+describe("validateTiers parent rate modes", () => {
+  it("optional: a blank parent rate is saved as not set", () => {
+    expect(validateTiers([{ key: "a", label: "1 to 1", parent_rate: " ", tutor_rate: "50" }], "optional"))
+      .toEqual({ ok: true, tiers: [{ label: "1 to 1", parent_rate: null, tutor_rate: 50, sort_order: 0 }] })
+  })
+  it("optional: a typed parent rate must still be a number", () => {
+    expect(validateTiers([{ key: "a", label: "1 to 1", parent_rate: "abc", tutor_rate: "50" }], "optional")).toMatchObject({ ok: false })
+  })
+  it("none: ignores the parent rate and names the error for tutors", () => {
+    expect(validateTiers([{ key: "a", label: "1 to 1", parent_rate: "999", tutor_rate: "45" }], "none"))
+      .toEqual({ ok: true, tiers: [{ label: "1 to 1", parent_rate: null, tutor_rate: 45, sort_order: 0 }] })
+    expect(validateTiers([{ key: "a", label: "1 to 1", parent_rate: "", tutor_rate: "" }], "none"))
+      .toEqual({ ok: false, error: 'Hourly pay for "1 to 1" must be a number of 0 or more.' })
+  })
+  it("draftsFromTiers shows an unset parent rate as blank", () => {
+    const [d] = draftsFromTiers([{ id: "t", assignment_id: "a", label: "1 to 1", parent_rate: null, tutor_rate: 50, sort_order: 0 }])
+    expect(d.parent_rate).toBe("")
   })
 })

@@ -19,9 +19,11 @@ import type { SessionPayload } from "@/lib/portal/sessions"
 import { SessionForm } from "@/components/portal/session-form"
 import type { PortalAssignment } from "@/components/portal/use-portal-context"
 import {
-  entryAmount, entryToSessionInput, patchFromPayload, summariseEntries, type ApprovalEntry, type QueueSubmission,
+  entryAmount, entryToSessionInput, missingParentRateTiers, patchFromPayload, summariseEntries,
+  type ApprovalEntry, type QueueSubmission,
 } from "@/lib/tm/approvals"
 import { EntryEditsBadge } from "./entry-edits-popover"
+import { ParentRatesDialog } from "./parent-rates-dialog"
 
 interface Props {
   submission: QueueSubmission
@@ -37,9 +39,11 @@ export function SubmissionReview({ submission, onChanged, onDone }: Props) {
   const [reason, setReason] = useState("")
   const [approving, setApproving] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [settingRates, setSettingRates] = useState(false)
 
   const month = periodLabel({ year: submission.year, month: submission.month })
   const totals = summariseEntries(submission.entries)
+  const missingRates = missingParentRateTiers(submission.entries)
 
   async function openEdit(entry: ApprovalEntry) {
     const supabase = createClient()
@@ -145,9 +149,9 @@ export function SubmissionReview({ submission, onChanged, onDone }: Props) {
                     <TableCell>{e.start_time && e.end_time ? `${e.start_time} to ${e.end_time}` : ""}</TableCell>
                     <TableCell className="text-right">{formatHours(e.hours)}</TableCell>
                     <TableCell>{e.tier_label}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(e.parent_rate)}</TableCell>
+                    <TableCell className="text-right">{e.parent_rate_missing ? <span className="text-destructive">Not set</span> : formatCurrency(e.parent_rate)}</TableCell>
                     <TableCell className="text-right">{formatCurrency(e.tutor_rate)}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(entryAmount(e))}</TableCell>
+                    <TableCell className="text-right">{e.parent_rate_missing ? "-" : formatCurrency(entryAmount(e))}</TableCell>
                     <TableCell className="max-w-xs">
                       <div className="flex items-center gap-2">
                         <EntryEditsBadge edits={e.edits} />
@@ -167,12 +171,29 @@ export function SubmissionReview({ submission, onChanged, onDone }: Props) {
             {totals.sessions} sessions · {formatHours(totals.hours)} h · Invoice {formatCurrency(totals.amount)} · Payout {formatCurrency(totals.payout)} · Profit {formatCurrency(totals.profit)}
           </p>
 
+          {missingRates.length > 0 && (
+            <div role="alert" className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+              <span>Set the parent rate for {missingRates.join(", ")} before approving. The invoice total above counts those sessions as $0.</span>
+              <Button size="sm" variant="outline" onClick={() => setSettingRates(true)}>Set parent rates</Button>
+            </div>
+          )}
+
           <div className="flex justify-end gap-2">
+            {missingRates.length === 0 && (
+              <Button variant="ghost" onClick={() => setSettingRates(true)}>Parent rates</Button>
+            )}
             <Button variant="outline" onClick={() => { setReason(""); setReturning(true) }}>Send back</Button>
-            <Button onClick={() => setApproving(true)}>Approve</Button>
+            <Button onClick={() => setApproving(true)} disabled={missingRates.length > 0}>Approve</Button>
           </div>
         </CardContent>
       </Card>
+
+      <ParentRatesDialog
+        assignmentId={settingRates ? submission.assignment_id : null}
+        title={`${submission.code} · ${submission.studentName}`}
+        onClose={() => setSettingRates(false)}
+        onSaved={onChanged}
+      />
 
       <Dialog open={editing !== null} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent>

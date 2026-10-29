@@ -1,13 +1,13 @@
 import { describe, it, expect } from "vitest"
 import {
   summariseEntries, entryAmount, groupByTutor, outstandingReturns, describeEdit, entryToSessionInput, patchFromPayload,
-  sortEntries, mapQueueRow, mapReturnedRow, invoiceLines, type ApprovalEntry, type QueueSubmission, type ReturnedSubmission,
+  sortEntries, mapQueueRow, mapReturnedRow, invoiceLines, mapEntryRow, missingParentRateTiers, type ApprovalEntry, type QueueSubmission, type ReturnedSubmission,
 } from "./approvals"
 
 function entry(over: Partial<ApprovalEntry>): ApprovalEntry {
   return {
     id: "e", assignment_id: "a", date: "2026-09-04", start_time: null, end_time: null, hours: 1,
-    rate_tier_id: "t", tier_label: "1 to 1", parent_rate: 70, tutor_rate: 50, note: null, status: "submitted", edits: [],
+    rate_tier_id: "t", tier_label: "1 to 1", parent_rate: 70, parent_rate_missing: false, tutor_rate: 50, note: null, status: "submitted", edits: [],
     ...over,
   }
 }
@@ -148,5 +148,20 @@ describe("invoiceLines", () => {
   })
   it("is empty for no entries", () => {
     expect(invoiceLines([])).toEqual([])
+  })
+})
+
+describe("missing parent rates", () => {
+  it("flags an entry whose parent rate is not set and counts it as 0", () => {
+    const e = mapEntryRow({ id: "e", assignment_id: "a", date: "2026-10-04", start_time: null, end_time: null, hours: "2", rate_tier_id: "t", tier_label: "1 to 1", parent_rate: null, tutor_rate: "50", note: null, status: "submitted", tm_entry_edits: [] })
+    expect(e).toMatchObject({ parent_rate: 0, parent_rate_missing: true, tutor_rate: 50 })
+  })
+  it("lists each tier label missing a rate once, sorted", () => {
+    expect(missingParentRateTiers([
+      entry({ tier_label: "Zoom", parent_rate_missing: true }),
+      entry({ tier_label: "1 to 1" }),
+      entry({ tier_label: "Group", parent_rate_missing: true }),
+      entry({ tier_label: "Zoom", parent_rate_missing: true }),
+    ])).toEqual(["Group", "Zoom"])
   })
 })

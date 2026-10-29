@@ -25,7 +25,9 @@ export interface ApprovalEntry {
   hours: number
   rate_tier_id: string | null
   tier_label: string
+  /** 0 when parent_rate_missing; approval is refused until admin sets the tier's rate. */
   parent_rate: number
+  parent_rate_missing: boolean
   tutor_rate: number
   note: string | null
   status: string
@@ -141,6 +143,7 @@ export function mapEntryRow(r: RawEntryRow): ApprovalEntry {
     rate_tier_id: r.rate_tier_id,
     tier_label: r.tier_label ?? "",
     parent_rate: toNumber(r.parent_rate) ?? 0,
+    parent_rate_missing: toNumber(r.parent_rate) === null,
     tutor_rate: toNumber(r.tutor_rate) ?? 0,
     note: r.note,
     status: r.status,
@@ -296,4 +299,9 @@ export function invoiceLines(entries: Pick<ApprovalEntry, "tier_label" | "parent
     hours: l.hourCents / 100,
     total: Math.round(l.tenThousandths / 100) / 100,
   }))
+}
+
+/** Tier labels in a submission whose sessions have no parent rate yet. */
+export function missingParentRateTiers(entries: Pick<ApprovalEntry, "tier_label" | "parent_rate_missing">[]): string[] {
+  return Array.from(new Set(entries.filter((e) => e.parent_rate_missing).map((e) => e.tier_label))).sort()
 }
