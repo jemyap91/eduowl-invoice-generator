@@ -7,6 +7,17 @@ function minutes(t: string): number | null {
   return m ? parseInt(m[1], 10) * 60 + parseInt(m[2], 10) : null
 }
 
+/** Start and end times are picked in 15-minute steps, from 6:00 AM to 11:45 PM. */
+export const QUARTER_HOUR_TIMES: string[] = Array.from({ length: (24 - 6) * 4 }, (_, i) => {
+  const m = 6 * 60 + i * 15
+  return `${pad(Math.floor(m / 60))}:${pad(m % 60)}`
+})
+
+export function isQuarterHour(t: string): boolean {
+  const m = minutes(t)
+  return m !== null && m % 15 === 0
+}
+
 /** "14:00","15:30" -> 1.5; null when malformed or end is not after start. */
 export function computeHours(start: string, end: string): number | null {
   const s = minutes(start)
@@ -62,6 +73,7 @@ export function validateSession(input: SessionInput, today: string): SessionVali
 
   if (start || end) {
     if (!start || !end) return { ok: false, error: "Enter both a start and an end time, or the number of hours." }
+    if (!isQuarterHour(start) || !isQuarterHour(end)) return { ok: false, error: "Times go in 15-minute steps, e.g. 2:15 PM." }
     if (computeHours(start, end) === null) return { ok: false, error: "The end time must be after the start time." }
     return {
       ok: true,
@@ -71,6 +83,7 @@ export function validateSession(input: SessionInput, today: string): SessionVali
 
   const hours = Number(input.hours)
   if (!Number.isFinite(hours) || hours <= 0) return { ok: false, error: "Hours must be more than 0." }
+  if (!Number.isInteger(hours * 4)) return { ok: false, error: "Hours go in quarter hours, e.g. 1.25 or 1.5." }
   return {
     ok: true,
     payload: { assignment_id: input.assignmentId, date: input.date, start_time: null, end_time: null, hours: Math.round(hours * 100) / 100, rate_tier_id: input.rateTierId, note },

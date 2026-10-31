@@ -1,6 +1,11 @@
-import { test, expect } from "@playwright/test"
+import { test, expect, type Page } from "@playwright/test"
 import { signIn, users } from "./helpers/auth"
 import { createAssignmentForTutor, deleteAssignmentData } from "./helpers/admin"
+
+async function pickTime(page: Page, label: string, option: string) {
+  await page.getByLabel(label).click()
+  await page.getByRole("option", { name: option, exact: true }).click()
+}
 
 const stamp = Date.now().toString(36)
 const student = `E2E Portal Student ${stamp}`
@@ -28,8 +33,8 @@ test.describe.serial("tutor portal", () => {
     await page.goto("/portal")
     await page.getByRole("link", { name: "Log session" }).first().click()
     await expect(page).toHaveURL(/\/portal\/log\?assignment=/)
-    await page.getByLabel("Start time").fill("14:00")
-    await page.getByLabel("End time").fill("15:30")
+    await pickTime(page, "Start time", "2:00 PM")
+    await pickTime(page, "End time", "3:30 PM")
     await expect(page.getByText("1.50 hours")).toBeVisible()
     await page.getByLabel("Note").fill("E2E session")
     await page.getByRole("button", { name: "Save session" }).click()
@@ -44,8 +49,8 @@ test.describe.serial("tutor portal", () => {
   test("edits the session hours", async ({ page }) => {
     await page.goto("/portal/timesheet")
     await page.getByRole("button", { name: /^Edit session on / }).first().click()
-    await page.getByLabel("Start time").fill("")
-    await page.getByLabel("End time").fill("")
+    await pickTime(page, "Start time", "No time")
+    await pickTime(page, "End time", "No time")
     await page.getByLabel("Or hours").fill("2")
     await page.getByRole("button", { name: "Save changes" }).click()
     await expect(page.getByText("Session updated", { exact: true }).first()).toBeVisible()

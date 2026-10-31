@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { formatCurrency } from "@/lib/format"
-import { computeHours, todayIso, validateSession, type SessionInput, type SessionPayload } from "@/lib/portal/sessions"
+import { formatCurrency, formatTime } from "@/lib/format"
+import { QUARTER_HOUR_TIMES, computeHours, todayIso, validateSession, type SessionInput, type SessionPayload } from "@/lib/portal/sessions"
 import type { PortalAssignment } from "./use-portal-context"
 
 interface SessionFormProps {
@@ -27,8 +27,9 @@ export function SessionForm({
   const today = todayIso()
   const [assignmentId, setAssignmentId] = useState(initial?.assignmentId ?? defaultAssignmentId ?? (assignments.length === 1 ? assignments[0].id : ""))
   const [date, setDate] = useState(initial?.date ?? today)
-  const [start, setStart] = useState(initial?.start ?? "")
-  const [end, setEnd] = useState(initial?.end ?? "")
+  // Saved times come back from Postgres as "14:00:00"
+  const [start, setStart] = useState((initial?.start ?? "").slice(0, 5))
+  const [end, setEnd] = useState((initial?.end ?? "").slice(0, 5))
   const [hours, setHours] = useState(initial?.hours ?? "")
   const [rateTierId, setRateTierId] = useState(initial?.rateTierId ?? "")
   const [note, setNote] = useState(initial?.note ?? "")
@@ -74,11 +75,11 @@ export function SessionForm({
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">
           <Label htmlFor="session-start">Start time</Label>
-          <Input id="session-start" type="time" value={start} onChange={(e) => setStart(e.target.value)} />
+          <TimeSelect id="session-start" value={start} onChange={setStart} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="session-end">End time</Label>
-          <Input id="session-end" type="time" value={end} onChange={(e) => setEnd(e.target.value)} />
+          <TimeSelect id="session-end" value={end} onChange={setEnd} />
         </div>
       </div>
 
@@ -114,5 +115,23 @@ export function SessionForm({
         <Button type="submit" disabled={isLoading}>{isLoading ? "Saving..." : submitLabel}</Button>
       </div>
     </form>
+  )
+}
+
+const NO_TIME = "none"
+
+function TimeSelect({ id, value, onChange }: { id: string; value: string; onChange: (v: string) => void }) {
+  // Keep an older off-quarter time visible when editing; validation asks the tutor to change it
+  const options = value && !QUARTER_HOUR_TIMES.includes(value) ? [value, ...QUARTER_HOUR_TIMES] : QUARTER_HOUR_TIMES
+  return (
+    <Select value={value || NO_TIME} onValueChange={(v) => onChange(v === NO_TIME ? "" : v)}>
+      <SelectTrigger id={id}><SelectValue /></SelectTrigger>
+      <SelectContent className="max-h-72">
+        <SelectItem value={NO_TIME}>No time</SelectItem>
+        {options.map((t) => (
+          <SelectItem key={t} value={t}>{formatTime(t)}</SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   )
 }

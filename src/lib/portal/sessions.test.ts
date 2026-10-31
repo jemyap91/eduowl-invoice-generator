@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { computeHours, todayIso, monthBounds, validateSession, type SessionInput } from "./sessions"
+import { QUARTER_HOUR_TIMES, computeHours, todayIso, monthBounds, validateSession, type SessionInput } from "./sessions"
 
 const base: SessionInput = {
   assignmentId: "a1", date: "2026-09-04", start: "14:00", end: "15:30", hours: "", rateTierId: "t1", note: "",
@@ -60,5 +60,19 @@ describe("validateSession", () => {
     expect(validateSession({ ...base, start: "16:00" }, TODAY)).toEqual({ ok: false, error: "The end time must be after the start time." })
     expect(validateSession({ ...base, start: "", end: "", hours: "0" }, TODAY)).toEqual({ ok: false, error: "Hours must be more than 0." })
     expect(validateSession({ ...base, start: "", end: "", hours: "x" }, TODAY)).toEqual({ ok: false, error: "Hours must be more than 0." })
+  })
+  it("only accepts quarter-hour times and hours", () => {
+    expect(validateSession({ ...base, start: "14:10" }, TODAY)).toEqual({ ok: false, error: "Times go in 15-minute steps, e.g. 2:15 PM." })
+    expect(validateSession({ ...base, start: "", end: "", hours: "1.1" }, TODAY)).toEqual({ ok: false, error: "Hours go in quarter hours, e.g. 1.25 or 1.5." })
+    expect(validateSession({ ...base, start: "", end: "", hours: "1.75" }, TODAY).ok).toBe(true)
+  })
+})
+
+describe("QUARTER_HOUR_TIMES", () => {
+  it("runs from 6:00 AM to 11:45 PM in 15-minute steps", () => {
+    expect(QUARTER_HOUR_TIMES[0]).toBe("06:00")
+    expect(QUARTER_HOUR_TIMES[1]).toBe("06:15")
+    expect(QUARTER_HOUR_TIMES.at(-1)).toBe("23:45")
+    expect(QUARTER_HOUR_TIMES).toHaveLength(72)
   })
 })
